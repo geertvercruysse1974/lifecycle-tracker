@@ -4,80 +4,80 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Infrastructure Lifecycle Tracker</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
   --bg:#f4f6f8; --surface:#fff; --text:#111827; --muted:#6b7280; --border:#e5e7eb;
   --header:#1f2937; --primary:#2563eb; --primary-h:#1d4ed8;
-  --green:#16a34a; --orange:#ea580c; --red:#dc2626;
-  --shadow:0 2px 5px rgba(0,0,0,.1);
+  --green:#16a34a; --orange:#ea580c; --red:#dc2626; --shadow:0 2px 5px rgba(0,0,0,.1);
 }
 @media (prefers-color-scheme: dark){
-  :root{
-    --bg:#0f172a; --surface:#1e293b; --text:#f1f5f9; --muted:#94a3b8; --border:#334155;
-    --header:#020617; --shadow:0 2px 5px rgba(0,0,0,.4);
-  }
+  :root{--bg:#0f172a;--surface:#1e293b;--text:#f1f5f9;--muted:#94a3b8;--border:#334155;--header:#020617;--shadow:0 2px 5px rgba(0,0,0,.4)}
 }
 *{box-sizing:border-box}
 body{font-family:Arial,sans-serif;background:var(--bg);color:var(--text);margin:0}
-header{background:var(--header);color:#fff;padding:20px}
-header h1{margin:0 0 4px}
-header p{margin:0;opacity:.8}
-.container{max-width:1300px;margin:auto;padding:20px}
+header{background:var(--header);color:#fff;padding:16px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+header h1{margin:0;font-size:22px}
+header p{margin:2px 0 0;opacity:.8;font-size:13px}
+header .who{margin-left:auto;font-size:13px;display:flex;align-items:center;gap:10px}
+.container{max-width:1400px;margin:auto;padding:20px}
+[hidden]{display:none!important}
 
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:20px}
-.card{background:var(--surface);border-radius:10px;padding:18px 20px;box-shadow:var(--shadow);
-  border:2px solid transparent;cursor:pointer;text-align:left;color:inherit;font:inherit;width:100%}
-.card:hover{border-color:var(--border)}
-.card.active{border-color:var(--primary)}
-.card h2{margin:0;font-size:32px}
-.card p{margin:4px 0 0;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:16px}
+.card{background:var(--surface);border-radius:10px;padding:16px 20px;box-shadow:var(--shadow);border:2px solid transparent;
+  cursor:pointer;text-align:left;color:inherit;font:inherit;width:100%}
+.card:hover{border-color:var(--border)} .card.active{border-color:var(--primary)}
+.card h2{margin:0;font-size:30px} .card p{margin:4px 0 0;color:var(--muted)}
 .green{color:var(--green)} .orange{color:var(--orange)} .red{color:var(--red)}
 
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.chip{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:20px;padding:6px 12px;font-size:13px;cursor:pointer}
+.chip:hover{background:var(--bg)} .chip.active{border-color:var(--primary);box-shadow:0 0 0 1px var(--primary)}
+.chip b{font-weight:bold}
+
 .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:15px}
-.toolbar input,.toolbar select{padding:10px;border:1px solid var(--border);border-radius:6px;
-  background:var(--surface);color:var(--text);font:inherit}
+.toolbar input,.toolbar select{padding:10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font:inherit}
 .toolbar .search{flex:1;min-width:200px}
 .spacer{flex:1}
 
-button,.btn{background:var(--primary);color:#fff;border:none;padding:10px 16px;border-radius:6px;
-  cursor:pointer;font:inherit;display:inline-block}
+button,.btn{background:var(--primary);color:#fff;border:none;padding:10px 16px;border-radius:6px;cursor:pointer;font:inherit;display:inline-block}
 button:hover,.btn:hover{background:var(--primary-h)}
 button.secondary,.btn.secondary{background:var(--surface);color:var(--text);border:1px solid var(--border)}
 button.secondary:hover,.btn.secondary:hover{background:var(--bg)}
 button.danger{background:var(--red)}
 button.small{padding:5px 10px;font-size:13px}
+button:disabled{opacity:.6;cursor:wait}
 
 .table-wrap{overflow-x:auto;background:var(--surface);border-radius:10px;box-shadow:var(--shadow)}
 table{width:100%;border-collapse:collapse}
 th{background:var(--header);color:#fff;user-select:none;white-space:nowrap}
-th.sortable{cursor:pointer}
-th.sortable:hover{background:#374151}
+th.sortable{cursor:pointer} th.sortable:hover{background:#374151}
 th,td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;vertical-align:middle}
 tr:last-child td{border-bottom:none}
-td.num{white-space:nowrap}
-td.actions{white-space:nowrap;text-align:right}
+td.num{white-space:nowrap} td.actions{white-space:nowrap;text-align:right}
 .sub{display:block;color:var(--muted);font-size:12px}
 .empty{padding:40px;text-align:center;color:var(--muted)}
-
 .status{padding:5px 10px;border-radius:6px;color:#fff;font-weight:bold;font-size:13px;white-space:nowrap}
-.status.green{background:var(--green);color:#fff}
-.status.orange{background:var(--orange);color:#fff}
-.status.red{background:var(--red);color:#fff}
+.status.green{background:var(--green);color:#fff} .status.orange{background:var(--orange);color:#fff} .status.red{background:var(--red);color:#fff}
 
-dialog{border:none;border-radius:12px;padding:0;width:min(560px,94vw);background:var(--surface);color:var(--text);
-  box-shadow:0 10px 40px rgba(0,0,0,.35)}
+/* login */
+#login{max-width:380px;margin:80px auto;background:var(--surface);padding:28px;border-radius:12px;box-shadow:var(--shadow)}
+#login h2{margin-top:0}
+#login input{width:100%;padding:10px;margin:5px 0 14px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font:inherit}
+.err{color:var(--red);font-size:14px;margin:0 0 12px}
+
+dialog{border:none;border-radius:12px;padding:0;width:min(580px,94vw);background:var(--surface);color:var(--text);box-shadow:0 10px 40px rgba(0,0,0,.35)}
 dialog::backdrop{background:rgba(0,0,0,.5)}
-dialog form{padding:22px}
+dialog form,dialog .body{padding:22px}
 dialog h2{margin-top:0}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
-.grid .full{grid-column:1/-1}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px} .grid .full{grid-column:1/-1}
 label{font-size:14px;font-weight:bold}
-dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 14px;border:1px solid var(--border);
-  border-radius:6px;background:var(--bg);color:var(--text);font:inherit}
+dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 14px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font:inherit}
 .dialog-actions{display:flex;gap:10px;justify-content:flex-end}
 .warn{color:var(--orange);font-size:13px;margin:-8px 0 12px;display:none}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--header);color:#fff;
-  padding:10px 18px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .25s}
+.log{max-height:55vh;overflow:auto;font-size:13px}
+.log div{padding:8px 0;border-bottom:1px solid var(--border)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--header);color:#fff;padding:10px 18px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:10}
 .toast.show{opacity:1}
 @media(max-width:600px){.grid{grid-template-columns:1fr}}
 </style>
@@ -85,32 +85,50 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
 <body>
 
 <header>
-  <h1>Infrastructure Lifecycle Tracker</h1>
-  <p>Voor Dell, HPE, NetApp, VMware, Veeam en andere assets</p>
+  <div>
+    <h1>Infrastructure Lifecycle Tracker</h1>
+    <p>Dell, HPE, NetApp, VMware, Veeam en andere assets</p>
+  </div>
+  <div class="who" id="who" hidden>
+    <span id="whoText"></span>
+    <button class="secondary small" id="logoutBtn">Afmelden</button>
+  </div>
 </header>
 
-<div class="container">
+<!-- ============ LOGIN ============ -->
+<form id="login" hidden>
+  <h2>Aanmelden</h2>
+  <label for="email">E-mail</label>
+  <input type="email" id="email" autocomplete="username" required>
+  <label for="password">Wachtwoord</label>
+  <input type="password" id="password" autocomplete="current-password" required>
+  <p class="err" id="loginErr" hidden></p>
+  <button type="submit" style="width:100%">Aanmelden</button>
+</form>
 
-  <div class="cards" id="cards">
+<div class="container" id="app" hidden>
+
+  <div class="cards">
     <button class="card active" data-filter="all"><h2 id="totalAssets">0</h2><p>Assets</p></button>
     <button class="card" data-filter="supported"><h2 class="green" id="supported">0</h2><p>Onder support</p></button>
     <button class="card" data-filter="expiring"><h2 class="orange" id="expiring">0</h2><p id="expiringLabel">Vervalt binnen 90 dagen</p></button>
     <button class="card" data-filter="expired"><h2 class="red" id="expired">0</h2><p>Verlopen</p></button>
   </div>
 
+  <div class="chips" id="chips"></div>
+
   <div class="toolbar">
     <input class="search" type="search" id="search" placeholder="Zoek op hostname, model, serial, locatie, eigenaar…">
     <select id="vendorFilter"><option value="">Alle vendors</option></select>
     <label for="threshold" style="font-weight:normal">Waarschuwing:</label>
     <select id="threshold">
-      <option value="30">30 dagen</option>
-      <option value="60">60 dagen</option>
-      <option value="90" selected>90 dagen</option>
-      <option value="180">180 dagen</option>
+      <option value="30">30 dagen</option><option value="60">60 dagen</option>
+      <option value="90" selected>90 dagen</option><option value="180">180 dagen</option>
       <option value="365">365 dagen</option>
     </select>
     <span class="spacer"></span>
     <button id="addBtn">+ Asset toevoegen</button>
+    <button class="secondary" id="custBtn" hidden>+ Klant</button>
     <button class="secondary" id="exportBtn">Export CSV</button>
     <label class="btn secondary" style="font-weight:normal">Import CSV
       <input type="file" id="importFile" accept=".csv,text/csv" hidden>
@@ -119,184 +137,225 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
 
   <div class="table-wrap">
     <table>
-      <thead>
-        <tr>
-          <th class="sortable" data-sort="hostname">Hostname</th>
-          <th class="sortable" data-sort="vendor">Vendor</th>
-          <th class="sortable" data-sort="model">Model</th>
-          <th class="sortable" data-sort="serial">Serial</th>
-          <th class="sortable" data-sort="location">Locatie / Eigenaar</th>
-          <th class="sortable" data-sort="warranty">Warranty tot</th>
-          <th class="sortable" data-sort="days">Resterend</th>
-          <th>Status</th>
-          <th></th>
-        </tr>
-      </thead>
+      <thead><tr>
+        <th class="sortable" data-sort="customer_name">Klant</th>
+        <th class="sortable" data-sort="hostname">Hostname</th>
+        <th class="sortable" data-sort="vendor">Vendor</th>
+        <th class="sortable" data-sort="model">Model</th>
+        <th class="sortable" data-sort="serial">Serial</th>
+        <th class="sortable" data-sort="location">Locatie / Eigenaar</th>
+        <th class="sortable" data-sort="warranty">Warranty tot</th>
+        <th class="sortable" data-sort="days">Resterend</th>
+        <th>Status</th><th></th>
+      </tr></thead>
       <tbody id="assetTable"></tbody>
     </table>
-    <div class="empty" id="empty" hidden>Geen assets gevonden.</div>
+    <div class="empty" id="empty" hidden></div>
   </div>
 </div>
 
+<!-- ============ ASSET DIALOG ============ -->
 <dialog id="dialog">
   <form id="assetForm" method="dialog">
     <h2 id="dialogTitle">Asset toevoegen</h2>
     <div class="grid">
-      <div>
-        <label for="hostname">Hostname *</label>
-        <input type="text" id="hostname" required>
+      <div class="full">
+        <label for="customer">Klant *</label>
+        <select id="customer" required></select>
       </div>
+      <div><label for="hostname">Hostname *</label><input type="text" id="hostname" required></div>
       <div>
         <label for="vendor">Vendor</label>
-        <select id="vendor">
-          <option>Dell</option><option>HPE</option><option>NetApp</option>
-          <option>VMware</option><option>Veeam</option><option>Andere</option>
-        </select>
+        <select id="vendor"><option>Dell</option><option>HPE</option><option>NetApp</option><option>VMware</option><option>Veeam</option><option>Andere</option></select>
       </div>
-      <div>
-        <label for="model">Model</label>
-        <input type="text" id="model">
-      </div>
-      <div>
-        <label for="serial">Serienummer</label>
-        <input type="text" id="serial">
-      </div>
-      <div class="full warn" id="dupWarn">Let op: dit serienummer bestaat al in de lijst.</div>
-      <div>
-        <label for="location">Locatie</label>
-        <input type="text" id="location" placeholder="bv. DC1 – Rack 12">
-      </div>
-      <div>
-        <label for="owner">Eigenaar / klant</label>
-        <input type="text" id="owner">
-      </div>
-      <div class="full">
-        <label for="warranty">Warranty einddatum *</label>
-        <input type="date" id="warranty" required>
-      </div>
-      <div class="full">
-        <label for="notes">Notities</label>
-        <textarea id="notes" rows="3" placeholder="Contractnummer, verlengingsstatus, …"></textarea>
-      </div>
+      <div><label for="model">Model</label><input type="text" id="model"></div>
+      <div><label for="serial">Serienummer</label><input type="text" id="serial"></div>
+      <div class="full warn" id="dupWarn">Let op: dit serienummer bestaat al bij deze klant.</div>
+      <div><label for="location">Locatie</label><input type="text" id="location" placeholder="bv. DC1 – Rack 12"></div>
+      <div><label for="owner">Eigenaar / contact</label><input type="text" id="owner"></div>
+      <div class="full"><label for="warranty">Warranty einddatum *</label><input type="date" id="warranty" required></div>
+      <div class="full"><label for="notes">Notities</label><textarea id="notes" rows="3" placeholder="Contractnummer, verlengingsstatus, …"></textarea></div>
     </div>
     <div class="dialog-actions">
       <button type="button" class="secondary" id="cancelBtn">Annuleren</button>
-      <button type="submit">Opslaan</button>
+      <button type="submit" id="saveBtn">Opslaan</button>
     </div>
   </form>
+</dialog>
+
+<!-- ============ HISTORY DIALOG ============ -->
+<dialog id="histDialog">
+  <div class="body">
+    <h2 id="histTitle">Historiek</h2>
+    <div class="log" id="histLog"></div>
+    <div class="dialog-actions" style="margin-top:14px"><button class="secondary" id="histClose">Sluiten</button></div>
+  </div>
 </dialog>
 
 <div class="toast" id="toast"></div>
 
 <script>
+/* =====================================================
+   CONFIG – fill in from Supabase: Project Settings -> API
+   (use the anon / public key, NEVER the service_role key)
+   ===================================================== */
+const SUPABASE_URL = 'https://hhhxcrlcczkwboenkwhx.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhoaHhjcmxjY3prd2JvZW5rd2h4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU2MjA3ODEsImV4cCI6MjExMTE5Njc4MX0.Ym3pj5PE0kTrTENxitVafHA7mDqF7xajNQRIuKpKNQI';
+
 const $ = id => document.getElementById(id);
-const STORE = 'assets';
-const SETTINGS = 'assetSettings';
+const configured = !SUPABASE_URL.includes('YOUR-PROJECT') && !SUPABASE_ANON_KEY.includes('YOUR-ANON');
+const sb = configured ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-let assets = load(STORE, []);
-let settings = Object.assign({threshold: 90}, load(SETTINGS, {}));
-let state = {filter:'all', sortKey:'warranty', sortDir:1, editId:null};
+let me = null;                 // {id,email,role}
+let customers = [];
+let assets = [];
+let settings = {threshold: 90};
+try { settings = Object.assign(settings, JSON.parse(localStorage.getItem('assetSettings') || '{}')); } catch(e){}
+let state = {filter:'all', customer:'', sortKey:'warranty', sortDir:1, editId:null};
 
-// migrate old data: give everything an id + new fields
-assets = assets.map(a => Object.assign(
-  {id: uid(), hostname:'', vendor:'Andere', model:'', serial:'', location:'', owner:'', notes:'', warranty:''}, a));
-
-function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
-
-function load(key, fallback){
-  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
-  catch(e){ return fallback; }
-}
-function save(){
-  try {
-    localStorage.setItem(STORE, JSON.stringify(assets));
-    localStorage.setItem(SETTINGS, JSON.stringify(settings));
-  } catch(e){ toast('Opslaan in de browser is mislukt'); }
-}
-
+/* ---------- helpers ---------- */
 function esc(s){
-  return String(s ?? '').replace(/[&<>"']/g, c =>
-    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-
-// ---- dates (local time, no timezone drift) ----
+let toastT;
+function toast(msg){
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3200);
+}
+function fail(err, what){
+  console.error(err);
+  toast(`${what}: ${err && err.message ? err.message : err}`);
+}
 function parseDate(str){
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(str || '');
   return m ? new Date(+m[1], +m[2]-1, +m[3]) : null;
 }
 function daysLeft(str){
-  const d = parseDate(str);
-  if(!d) return null;
+  const d = parseDate(str); if(!d) return null;
   const t = new Date(); t.setHours(0,0,0,0);
   return Math.round((d - t) / 86400000);
 }
 function getStatus(days){
   if(days === null || days < 0) return 'expired';
-  if(days <= settings.threshold) return 'expiring';
-  return 'supported';
+  return days <= settings.threshold ? 'expiring' : 'supported';
 }
-const STATUS_UI = {
-  supported:{label:'Actief', css:'green'},
-  expiring:{label:'Binnenkort', css:'orange'},
-  expired:{label:'Verlopen', css:'red'}
-};
-function remaining(days){
-  if(days === null) return '—';
-  if(days < 0) return `${-days} d verlopen`;
-  if(days === 0) return 'Vandaag';
-  if(days >= 365) return `${(days/365).toFixed(1).replace('.', ',')} jaar`;
-  return `${days} d`;
+const STATUS_UI = {supported:{label:'Actief',css:'green'}, expiring:{label:'Binnenkort',css:'orange'}, expired:{label:'Verlopen',css:'red'}};
+function remaining(d){
+  if(d === null) return '—';
+  if(d < 0) return `${-d} d verlopen`;
+  if(d === 0) return 'Vandaag';
+  if(d >= 365) return `${(d/365).toFixed(1).replace('.', ',')} jaar`;
+  return `${d} d`;
 }
-function fmtDate(str){
-  const d = parseDate(str);
+function fmtDate(s){
+  const d = parseDate(s);
   return d ? d.toLocaleDateString('nl-BE', {day:'2-digit', month:'2-digit', year:'numeric'}) : '—';
 }
 
-// ---- render ----
+/* ---------- auth ---------- */
+async function boot(){
+  if(!configured){
+    $('login').hidden = false;
+    $('login').innerHTML = '<h2>Nog niet ingesteld</h2><p>Vul bovenaan het script <code>SUPABASE_URL</code> en <code>SUPABASE_ANON_KEY</code> in.</p>';
+    return;
+  }
+  const {data} = await sb.auth.getSession();
+  if(data.session) await enter(); else showLogin();
+  sb.auth.onAuthStateChange((ev) => { if(ev === 'SIGNED_OUT') showLogin(); });
+}
+function showLogin(){
+  me = null; customers = []; assets = [];
+  $('app').hidden = true; $('who').hidden = true; $('login').hidden = false;
+}
+$('login').addEventListener('submit', async e => {
+  e.preventDefault();
+  if(!configured) return;
+  $('loginErr').hidden = true;
+  const {error} = await sb.auth.signInWithPassword({email:$('email').value.trim(), password:$('password').value});
+  if(error){ $('loginErr').textContent = 'Aanmelden mislukt: ' + error.message; $('loginErr').hidden = false; return; }
+  $('password').value = '';
+  await enter();
+});
+$('logoutBtn').onclick = () => sb.auth.signOut();
+
+async function enter(){
+  const {data:{user}} = await sb.auth.getUser();
+  if(!user){ showLogin(); return; }
+  const {data:prof, error} = await sb.from('profiles').select('*').eq('id', user.id).single();
+  if(error){ fail(error, 'Profiel laden mislukt'); return; }
+  me = prof;
+  $('whoText').textContent = `${me.email} (${me.role === 'admin' ? 'admin' : 'engineer'})`;
+  $('who').hidden = false; $('login').hidden = true; $('app').hidden = false;
+  $('custBtn').hidden = me.role !== 'admin';
+  await loadAll();
+}
+
+/* ---------- data ---------- */
+async function fetchAll(table, order){
+  const out = []; const size = 1000;
+  for(let from = 0; ; from += size){
+    const {data, error} = await sb.from(table).select('*').order(order).range(from, from + size - 1);
+    if(error) throw error;
+    out.push(...data);
+    if(data.length < size) break;
+  }
+  return out;
+}
+async function loadAll(){
+  try {
+    [customers, assets] = await Promise.all([fetchAll('customers','name'), fetchAll('assets','warranty')]);
+  } catch(e){ fail(e, 'Laden mislukt'); }
+  render();
+}
+const custName = id => (customers.find(c => c.id === id) || {}).name || '—';
+
+/* ---------- render ---------- */
 function enriched(){
   return assets.map(a => {
     const days = daysLeft(a.warranty);
-    return Object.assign({}, a, {days, status:getStatus(days)});
+    return Object.assign({}, a, {days, status:getStatus(days), customer_name:custName(a.customer_id)});
   });
 }
-
 function render(){
   const all = enriched();
+  const scope = state.customer ? all.filter(a => a.customer_id === state.customer) : all;
 
-  // counters (always on the full set)
-  $('totalAssets').textContent = all.length;
-  $('supported').textContent = all.filter(a => a.status==='supported').length;
-  $('expiring').textContent = all.filter(a => a.status==='expiring').length;
-  $('expired').textContent = all.filter(a => a.status==='expired').length;
+  $('totalAssets').textContent = scope.length;
+  $('supported').textContent = scope.filter(a => a.status==='supported').length;
+  $('expiring').textContent = scope.filter(a => a.status==='expiring').length;
+  $('expired').textContent = scope.filter(a => a.status==='expired').length;
   $('expiringLabel').textContent = `Vervalt binnen ${settings.threshold} dagen`;
-  document.querySelectorAll('.card').forEach(c =>
-    c.classList.toggle('active', c.dataset.filter === state.filter));
+  document.querySelectorAll('.card').forEach(c => c.classList.toggle('active', c.dataset.filter === state.filter));
+
+  // per-customer chips
+  $('chips').innerHTML =
+    `<button class="chip ${state.customer===''?'active':''}" data-cust="">Alle klanten (${all.length})</button>` +
+    customers.map(c => {
+      const mine = all.filter(a => a.customer_id === c.id);
+      const exp = mine.filter(a => a.status==='expiring').length, ex = mine.filter(a => a.status==='expired').length;
+      return `<button class="chip ${state.customer===c.id?'active':''}" data-cust="${esc(c.id)}"><b>${esc(c.name)}</b> (${mine.length})` +
+        (exp ? ` <span class="orange">● ${exp}</span>` : '') + (ex ? ` <span class="red">● ${ex}</span>` : '') + `</button>`;
+    }).join('');
 
   // vendor dropdown
   const vf = $('vendorFilter'), cur = vf.value;
   const vendors = [...new Set(all.map(a => a.vendor).filter(Boolean))].sort();
-  vf.innerHTML = '<option value="">Alle vendors</option>' +
-    vendors.map(v => `<option>${esc(v)}</option>`).join('');
+  vf.innerHTML = '<option value="">Alle vendors</option>' + vendors.map(v => `<option>${esc(v)}</option>`).join('');
   vf.value = vendors.includes(cur) ? cur : '';
 
-  // filters
   const q = $('search').value.trim().toLowerCase();
-  let rows = all.filter(a =>
+  let rows = scope.filter(a =>
     (state.filter === 'all' || a.status === state.filter) &&
     (!vf.value || a.vendor === vf.value) &&
-    (!q || [a.hostname,a.vendor,a.model,a.serial,a.location,a.owner,a.notes]
-            .join(' ').toLowerCase().includes(q)));
+    (!q || [a.customer_name,a.hostname,a.vendor,a.model,a.serial,a.location,a.owner,a.notes].join(' ').toLowerCase().includes(q)));
 
-  // sort
   const k = state.sortKey, dir = state.sortDir;
   rows.sort((a,b) => {
     let x = a[k], y = b[k];
     if(k === 'days'){ x = a.days ?? 1e9; y = b.days ?? 1e9; }
-    if(k === 'warranty'){ x = a.warranty || '9999'; y = b.warranty || '9999'; }
     if(typeof x === 'string') return x.localeCompare(y, 'nl', {numeric:true}) * dir;
     return (x - y) * dir;
   });
-
   document.querySelectorAll('th.sortable').forEach(th => {
     const base = th.textContent.replace(/ [▲▼]$/, '');
     th.textContent = base + (th.dataset.sort === k ? (dir === 1 ? ' ▲' : ' ▼') : '');
@@ -304,114 +363,153 @@ function render(){
 
   $('assetTable').innerHTML = rows.map(a => {
     const ui = STATUS_UI[a.status];
-    return `
-    <tr>
+    return `<tr>
+      <td>${esc(a.customer_name)}</td>
       <td><strong>${esc(a.hostname)}</strong>${a.notes ? `<span class="sub" title="${esc(a.notes)}">📝 ${esc(a.notes.slice(0,40))}${a.notes.length>40?'…':''}</span>`:''}</td>
-      <td>${esc(a.vendor)}</td>
-      <td>${esc(a.model)}</td>
-      <td>${esc(a.serial)}</td>
+      <td>${esc(a.vendor)}</td><td>${esc(a.model)}</td><td>${esc(a.serial)}</td>
       <td>${esc(a.location) || '—'}${a.owner ? `<span class="sub">${esc(a.owner)}</span>` : ''}</td>
       <td class="num">${fmtDate(a.warranty)}</td>
       <td class="num ${ui.css}">${remaining(a.days)}</td>
       <td><span class="status ${ui.css}">${ui.label}</span></td>
       <td class="actions">
+        <button class="small secondary" data-hist="${esc(a.id)}" title="Historiek">⟲</button>
         <button class="small secondary" data-edit="${esc(a.id)}">Bewerk</button>
         <button class="small danger" data-del="${esc(a.id)}">✕</button>
-      </td>
-    </tr>`;
+      </td></tr>`;
   }).join('');
 
   $('empty').hidden = rows.length > 0;
-  $('empty').textContent = all.length ? 'Geen assets gevonden voor deze filter.'
-                                      : 'Nog geen assets. Klik op "+ Asset toevoegen" om te starten.';
+  $('empty').textContent = !customers.length
+    ? (me && me.role === 'admin' ? 'Nog geen klanten. Klik op "+ Klant" om te starten.' : 'Je hebt nog geen toegang tot een klant. Vraag een admin om toegang.')
+    : (assets.length ? 'Geen assets gevonden voor deze filter.' : 'Nog geen assets. Klik op "+ Asset toevoegen".');
 }
 
-// ---- dialog / CRUD ----
-const dlg = $('dialog');
-const fields = ['hostname','vendor','model','serial','location','owner','warranty','notes'];
-
-function openDialog(id){
-  state.editId = id || null;
-  const a = id ? assets.find(x => x.id === id) : null;
-  $('dialogTitle').textContent = a ? 'Asset bewerken' : 'Asset toevoegen';
-  fields.forEach(f => $(f).value = a ? (a[f] ?? '') : (f === 'vendor' ? 'Dell' : ''));
-  if(a && ![...$('vendor').options].some(o => o.value === a.vendor)){
-    $('vendor').add(new Option(a.vendor, a.vendor)); $('vendor').value = a.vendor;
-  }
-  checkDup();
-  dlg.showModal();
-  $('hostname').focus();
-}
-function checkDup(){
-  const s = $('serial').value.trim().toLowerCase();
-  const dup = s && assets.some(a => a.id !== state.editId && (a.serial||'').trim().toLowerCase() === s);
-  $('dupWarn').style.display = dup ? 'block' : 'none';
-}
-
-$('serial').addEventListener('input', checkDup);
-$('addBtn').onclick = () => openDialog();
-$('cancelBtn').onclick = () => dlg.close();
-
-$('assetForm').addEventListener('submit', e => {
-  e.preventDefault();
-  const data = {};
-  fields.forEach(f => data[f] = $(f).value.trim());
-  if(state.editId){
-    Object.assign(assets.find(a => a.id === state.editId), data);
-    toast('Asset bijgewerkt');
-  } else {
-    assets.push(Object.assign({id: uid()}, data));
-    toast('Asset toegevoegd');
-  }
-  save(); dlg.close(); render();
+/* ---------- filters / sort ---------- */
+document.querySelectorAll('.card').forEach(c => c.addEventListener('click', () => { state.filter = c.dataset.filter; render(); }));
+$('chips').addEventListener('click', e => {
+  const b = e.target.closest('[data-cust]'); if(!b) return;
+  state.customer = b.dataset.cust; render();
 });
-
-$('assetTable').addEventListener('click', e => {
-  const ed = e.target.closest('[data-edit]'), del = e.target.closest('[data-del]');
-  if(ed) openDialog(ed.dataset.edit);
-  if(del){
-    const a = assets.find(x => x.id === del.dataset.del);
-    if(a && confirm(`"${a.hostname}" verwijderen?`)){
-      assets = assets.filter(x => x.id !== a.id);
-      save(); render(); toast('Asset verwijderd');
-    }
-  }
-});
-
-// ---- filters / sorting ----
-document.querySelectorAll('.card').forEach(c =>
-  c.addEventListener('click', () => { state.filter = c.dataset.filter; render(); }));
 $('search').addEventListener('input', render);
 $('vendorFilter').addEventListener('change', render);
 $('threshold').value = String(settings.threshold);
 $('threshold').addEventListener('change', e => {
-  settings.threshold = +e.target.value; save(); render();
+  settings.threshold = +e.target.value;
+  try { localStorage.setItem('assetSettings', JSON.stringify(settings)); } catch(_){}
+  render();
 });
-document.querySelectorAll('th.sortable').forEach(th =>
-  th.addEventListener('click', () => {
-    const k = th.dataset.sort;
-    if(state.sortKey === k) state.sortDir *= -1; else { state.sortKey = k; state.sortDir = 1; }
-    render();
-  }));
+document.querySelectorAll('th.sortable').forEach(th => th.addEventListener('click', () => {
+  const k = th.dataset.sort;
+  if(state.sortKey === k) state.sortDir *= -1; else { state.sortKey = k; state.sortDir = 1; }
+  render();
+}));
 
-// ---- CSV export / import (semicolon, Excel-friendly) ----
-const CSV_COLS = ['hostname','vendor','model','serial','location','owner','warranty','notes'];
-
-function csvCell(v){
-  v = String(v ?? '');
-  return /[";\n\r]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v;
-}
-$('exportBtn').onclick = () => {
-  const lines = [CSV_COLS.join(';')].concat(
-    assets.map(a => CSV_COLS.map(c => csvCell(a[c])).join(';')));
-  const blob = new Blob(['\ufeff' + lines.join('\r\n')], {type:'text/csv;charset=utf-8'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `assets-${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
-  URL.revokeObjectURL(a.href);
+/* ---------- customers ---------- */
+$('custBtn').onclick = async () => {
+  const name = (prompt('Naam van de nieuwe klant:') || '').trim();
+  if(!name) return;
+  const {data, error} = await sb.from('customers').insert({name}).select().single();
+  if(error) return fail(error, 'Klant toevoegen mislukt');
+  customers.push(data); customers.sort((a,b) => a.name.localeCompare(b.name, 'nl'));
+  toast('Klant toegevoegd'); render();
 };
 
+/* ---------- asset dialog ---------- */
+const dlg = $('dialog');
+const F = ['hostname','vendor','model','serial','location','owner','warranty','notes'];
+
+function openDialog(id){
+  if(!customers.length){ toast('Er is nog geen klant beschikbaar'); return; }
+  state.editId = id || null;
+  const a = id ? assets.find(x => x.id === id) : null;
+  $('dialogTitle').textContent = a ? 'Asset bewerken' : 'Asset toevoegen';
+  $('customer').innerHTML = customers.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
+  $('customer').value = a ? a.customer_id : (state.customer || customers[0].id);
+  F.forEach(f => $(f).value = a ? (a[f] ?? '') : (f === 'vendor' ? 'Dell' : ''));
+  if(a && ![...$('vendor').options].some(o => o.value === a.vendor)) $('vendor').add(new Option(a.vendor, a.vendor)), $('vendor').value = a.vendor;
+  checkDup(); dlg.showModal(); $('hostname').focus();
+}
+function checkDup(){
+  const s = $('serial').value.trim().toLowerCase(), c = $('customer').value;
+  const dup = s && assets.some(a => a.id !== state.editId && a.customer_id === c && (a.serial||'').trim().toLowerCase() === s);
+  $('dupWarn').style.display = dup ? 'block' : 'none';
+}
+$('serial').addEventListener('input', checkDup);
+$('customer').addEventListener('change', checkDup);
+$('addBtn').onclick = () => openDialog();
+$('cancelBtn').onclick = () => dlg.close();
+
+$('assetForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const rec = {customer_id: $('customer').value};
+  F.forEach(f => rec[f] = $(f).value.trim());
+  $('saveBtn').disabled = true;
+  try {
+    if(state.editId){
+      const {data, error} = await sb.from('assets').update(rec).eq('id', state.editId).select().single();
+      if(error) throw error;
+      assets[assets.findIndex(a => a.id === state.editId)] = data;
+      toast('Asset bijgewerkt');
+    } else {
+      const {data, error} = await sb.from('assets').insert(rec).select().single();
+      if(error) throw error;
+      assets.push(data); toast('Asset toegevoegd');
+    }
+    dlg.close(); render();
+  } catch(err){ fail(err, 'Opslaan mislukt'); }
+  $('saveBtn').disabled = false;
+});
+
+$('assetTable').addEventListener('click', async e => {
+  const ed = e.target.closest('[data-edit]'), del = e.target.closest('[data-del]'), hist = e.target.closest('[data-hist]');
+  if(ed) openDialog(ed.dataset.edit);
+  if(hist) showHistory(hist.dataset.hist);
+  if(del){
+    const a = assets.find(x => x.id === del.dataset.del);
+    if(a && confirm(`"${a.hostname}" verwijderen?`)){
+      const {error} = await sb.from('assets').delete().eq('id', a.id);
+      if(error) return fail(error, 'Verwijderen mislukt');
+      assets = assets.filter(x => x.id !== a.id); render(); toast('Asset verwijderd');
+    }
+  }
+});
+
+/* ---------- history ---------- */
+async function showHistory(id){
+  const a = assets.find(x => x.id === id);
+  $('histTitle').textContent = `Historiek – ${a ? a.hostname : ''}`;
+  $('histLog').innerHTML = 'Laden…';
+  $('histDialog').showModal();
+  const {data, error} = await sb.from('audit_log').select('*').eq('asset_id', id).order('at', {ascending:false}).limit(50);
+  if(error){ $('histLog').textContent = 'Kon historiek niet laden.'; return; }
+  const labels = {customer_id:'klant',hostname:'hostname',vendor:'vendor',model:'model',serial:'serial',location:'locatie',owner:'eigenaar',warranty:'warranty',notes:'notities'};
+  $('histLog').innerHTML = data.map(r => {
+    let what = r.action === 'insert' ? 'aangemaakt' : r.action === 'delete' ? 'verwijderd' : '';
+    if(r.action === 'update'){
+      what = Object.keys(labels).filter(k => (r.old_data||{})[k] !== (r.new_data||{})[k]).map(k => {
+        const f = v => k === 'customer_id' ? custName(v) : (v === '' || v == null ? '∅' : String(v));
+        return `${labels[k]}: ${esc(f(r.old_data[k]))} → ${esc(f(r.new_data[k]))}`;
+      }).join('<br>') || 'geen wijziging';
+    }
+    return `<div><strong>${new Date(r.at).toLocaleString('nl-BE')}</strong> – ${esc(r.user_email || 'onbekend')}<br>${what}</div>`;
+  }).join('') || 'Geen historiek.';
+}
+$('histClose').onclick = () => $('histDialog').close();
+
+/* ---------- CSV ---------- */
+const CSV_COLS = ['customer','hostname','vendor','model','serial','location','owner','warranty','notes'];
+const csvCell = v => { v = String(v ?? ''); return /[";\n\r]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v; };
+
+$('exportBtn').onclick = () => {
+  const rows = enriched().filter(a => !state.customer || a.customer_id === state.customer);
+  const lines = [CSV_COLS.join(';')].concat(rows.map(a => CSV_COLS.map(c => csvCell(c === 'customer' ? a.customer_name : a[c])).join(';')));
+  const blob = new Blob(['\ufeff' + lines.join('\r\n')], {type:'text/csv;charset=utf-8'});
+  const link = document.createElement('a');
+  const suffix = state.customer ? '-' + custName(state.customer).replace(/[^\w-]+/g,'_') : '';
+  link.href = URL.createObjectURL(blob);
+  link.download = `assets${suffix}-${new Date().toISOString().slice(0,10)}.csv`;
+  link.click(); URL.revokeObjectURL(link.href);
+};
 function parseCSV(text){
   text = text.replace(/^\ufeff/, '');
   const first = text.split(/\r?\n/)[0] || '';
@@ -419,15 +517,11 @@ function parseCSV(text){
   const rows = []; let row = [], cell = '', q = false;
   for(let i = 0; i < text.length; i++){
     const c = text[i];
-    if(q){
-      if(c === '"'){ if(text[i+1] === '"'){ cell += '"'; i++; } else q = false; }
-      else cell += c;
-    } else if(c === '"') q = true;
+    if(q){ if(c === '"'){ if(text[i+1] === '"'){ cell += '"'; i++; } else q = false; } else cell += c; }
+    else if(c === '"') q = true;
     else if(c === delim){ row.push(cell); cell = ''; }
-    else if(c === '\n' || c === '\r'){
-      if(c === '\r' && text[i+1] === '\n') i++;
-      row.push(cell); rows.push(row); row = []; cell = '';
-    } else cell += c;
+    else if(c === '\n' || c === '\r'){ if(c === '\r' && text[i+1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
+    else cell += c;
   }
   if(cell !== '' || row.length){ row.push(cell); rows.push(row); }
   return rows.filter(r => r.some(c => c.trim() !== ''));
@@ -436,39 +530,62 @@ function normDate(s){
   s = (s || '').trim();
   let m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(s);
   if(m) return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
-  m = /^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/.exec(s);   // dd/mm/yyyy
+  m = /^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/.exec(s);
   return m ? `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}` : '';
 }
 $('importFile').addEventListener('change', async e => {
   const file = e.target.files[0]; e.target.value = '';
   if(!file) return;
   const rows = parseCSV(await file.text());
-  if(rows.length < 2){ toast('Geen rijen gevonden in CSV'); return; }
+  if(rows.length < 2) return toast('Geen rijen gevonden in CSV');
   const head = rows[0].map(h => h.trim().toLowerCase());
-  if(!head.includes('hostname')){ toast('CSV mist een "hostname"-kolom'); return; }
-  let added = 0, updated = 0, skipped = 0;
-  rows.slice(1).forEach(r => {
-    const rec = {};
-    head.forEach((h,i) => { if(CSV_COLS.includes(h)) rec[h] = (r[i] || '').trim(); });
-    rec.warranty = normDate(rec.warranty);
-    if(!rec.hostname || !rec.warranty){ skipped++; return; }
-    const existing = rec.serial && assets.find(a => (a.serial||'').toLowerCase() === rec.serial.toLowerCase());
-    if(existing){ Object.assign(existing, rec); updated++; }
-    else { assets.push(Object.assign({id: uid(), vendor:'Andere', model:'', serial:'', location:'', owner:'', notes:''}, rec)); added++; }
-  });
-  save(); render();
-  toast(`Import: ${added} nieuw, ${updated} bijgewerkt, ${skipped} overgeslagen`);
+  if(!head.includes('hostname')) return toast('CSV mist een "hostname"-kolom');
+  const hasCust = head.includes('customer') || head.includes('klant');
+  if(!hasCust && !state.customer) return toast('Geen klant-kolom in CSV: kies eerst een klant (bovenaan) om naar te importeren');
+
+  let added = 0, updated = 0, skipped = 0, newCust = 0;
+  const inserts = [];
+  const byName = new Map(customers.map(c => [c.name.toLowerCase(), c]));
+  try {
+    for(const r of rows.slice(1)){
+      const rec = {};
+      head.forEach((h,i) => { const k = h === 'klant' ? 'customer' : h; if(CSV_COLS.includes(k)) rec[k] = (r[i] || '').trim(); });
+      rec.warranty = normDate(rec.warranty);
+      if(!rec.hostname || !rec.warranty){ skipped++; continue; }
+
+      let cust;
+      if(hasCust){
+        if(!rec.customer){ skipped++; continue; }
+        cust = byName.get(rec.customer.toLowerCase());
+        if(!cust){
+          if(me.role !== 'admin'){ skipped++; continue; }
+          const {data, error} = await sb.from('customers').insert({name: rec.customer}).select().single();
+          if(error) throw error;
+          cust = data; customers.push(cust); byName.set(cust.name.toLowerCase(), cust); newCust++;
+        }
+      } else cust = customers.find(c => c.id === state.customer);
+      delete rec.customer;
+      rec.customer_id = cust.id;
+
+      const existing = rec.serial && assets.find(a => a.customer_id === cust.id && (a.serial||'').toLowerCase() === rec.serial.toLowerCase());
+      if(existing){
+        const {data, error} = await sb.from('assets').update(rec).eq('id', existing.id).select().single();
+        if(error) throw error;
+        assets[assets.indexOf(existing)] = data; updated++;
+      } else inserts.push(rec);
+    }
+    for(let i = 0; i < inserts.length; i += 200){
+      const {data, error} = await sb.from('assets').insert(inserts.slice(i, i + 200)).select();
+      if(error) throw error;
+      assets.push(...data); added += data.length;
+    }
+  } catch(err){ fail(err, 'Import onderbroken'); }
+  customers.sort((a,b) => a.name.localeCompare(b.name, 'nl'));
+  render();
+  toast(`Import: ${added} nieuw, ${updated} bijgewerkt, ${skipped} overgeslagen` + (newCust ? `, ${newCust} nieuwe klant(en)` : ''));
 });
 
-// ---- toast ----
-let toastT;
-function toast(msg){
-  const t = $('toast'); t.textContent = msg; t.classList.add('show');
-  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2800);
-}
-
-save();
-render();
+boot();
 </script>
 </body>
 </html>
