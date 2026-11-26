@@ -329,11 +329,11 @@ function render(){
 
   // per-customer chips
   $('chips').innerHTML =
-    `<button class="chip ${state.customer===''?'active':''}" data-cust="">Alle klanten (${all.length})</button>` +
+    `<button class="chip ${state.customer===''?'active':''}" data-cust="">Alle klanten · ${customers.length} klant${customers.length===1?'':'en'} · ${all.length} asset${all.length===1?'':'s'}</button>` +
     customers.map(c => {
       const mine = all.filter(a => a.customer_id === c.id);
       const exp = mine.filter(a => a.status==='expiring').length, ex = mine.filter(a => a.status==='expired').length;
-      return `<button class="chip ${state.customer===c.id?'active':''}" data-cust="${esc(c.id)}"><b>${esc(c.name)}</b> (${mine.length})` +
+      return `<button class="chip ${state.customer===c.id?'active':''}" data-cust="${esc(c.id)}"><b>${esc(c.name)}</b> · ${mine.length} asset${mine.length===1?'':'s'}` +
         (exp ? ` <span class="orange">● ${exp}</span>` : '') + (ex ? ` <span class="red">● ${ex}</span>` : '') + `</button>`;
     }).join('');
 
