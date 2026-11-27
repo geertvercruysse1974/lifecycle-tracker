@@ -145,6 +145,7 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
         <th class="sortable" data-sort="serial">Serial</th>
         <th class="sortable" data-sort="location">Locatie / Eigenaar</th>
         <th class="sortable" data-sort="warranty">Warranty tot</th>
+        <th class="sortable" data-sort="contract_end">Contract tot</th>
         <th class="sortable" data-sort="days">Resterend</th>
         <th>Status</th><th></th>
       </tr></thead>
@@ -173,8 +174,11 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
       <div class="full warn" id="dupWarn">Let op: dit serienummer bestaat al bij deze klant.</div>
       <div><label for="location">Locatie</label><input type="text" id="location" placeholder="bv. DC1 – Rack 12"></div>
       <div><label for="owner">Eigenaar / contact</label><input type="text" id="owner"></div>
-      <div class="full"><label for="warranty">Warranty einddatum *</label><input type="date" id="warranty" required></div>
-      <div class="full"><label for="notes">Notities</label><textarea id="notes" rows="3" placeholder="Contractnummer, verlengingsstatus, …"></textarea></div>
+      <div><label for="warranty">Warranty einddatum *</label><input type="date" id="warranty" required></div>
+      <div><label for="contract_end">Servicecontract einddatum</label><input type="date" id="contract_end"></div>
+      <div><label for="contract_type">Type servicecontract</label><input type="text" id="contract_type" placeholder="bv. ProSupport, Foundation Care"></div>
+      <div><label for="contract_number">Contractnummer</label><input type="text" id="contract_number"></div>
+      <div class="full"><label for="notes">Notities</label><textarea id="notes" rows="3" placeholder="Verlengingsstatus, offertenummer, …"></textarea></div>
     </div>
     <div class="dialog-actions">
       <button type="button" class="secondary" id="cancelBtn">Annuleren</button>
@@ -312,8 +316,12 @@ const custName = id => (customers.find(c => c.id === id) || {}).name || '—';
 /* ---------- render ---------- */
 function enriched(){
   return assets.map(a => {
-    const days = daysLeft(a.warranty);
-    return Object.assign({}, a, {days, status:getStatus(days), customer_name:custName(a.customer_id)});
+    // covered until = the later of warranty end and service contract end
+    const ends = [a.warranty, a.contract_end].filter(Boolean).sort();
+    const covered = ends.length ? ends[ends.length - 1] : null;
+    const via = a.contract_end && a.contract_end > (a.warranty || '') ? 'contract' : 'warranty';
+    const days = daysLeft(covered);
+    return Object.assign({}, a, {covered_until:covered, via, days, status:getStatus(days), customer_name:custName(a.customer_id)});
   });
 }
 function render(){
@@ -347,12 +355,13 @@ function render(){
   let rows = scope.filter(a =>
     (state.filter === 'all' || a.status === state.filter) &&
     (!vf.value || a.vendor === vf.value) &&
-    (!q || [a.customer_name,a.hostname,a.vendor,a.model,a.serial,a.location,a.owner,a.notes].join(' ').toLowerCase().includes(q)));
+    (!q || [a.customer_name,a.hostname,a.vendor,a.model,a.serial,a.location,a.owner,a.notes,a.contract_type,a.contract_number].join(' ').toLowerCase().includes(q)));
 
   const k = state.sortKey, dir = state.sortDir;
   rows.sort((a,b) => {
     let x = a[k], y = b[k];
     if(k === 'days'){ x = a.days ?? 1e9; y = b.days ?? 1e9; }
+    if(k === 'contract_end'){ x = a.contract_end || '9999-12-31'; y = b.contract_end || '9999-12-31'; }
     if(typeof x === 'string') return x.localeCompare(y, 'nl', {numeric:true}) * dir;
     return (x - y) * dir;
   });
@@ -369,7 +378,8 @@ function render(){
       <td>${esc(a.vendor)}</td><td>${esc(a.model)}</td><td>${esc(a.serial)}</td>
       <td>${esc(a.location) || '—'}${a.owner ? `<span class="sub">${esc(a.owner)}</span>` : ''}</td>
       <td class="num">${fmtDate(a.warranty)}</td>
-      <td class="num ${ui.css}">${remaining(a.days)}</td>
+      <td class="num">${a.contract_end ? fmtDate(a.contract_end) : '—'}${(a.contract_type || a.contract_number) ? `<span class="sub">${esc([a.contract_type, a.contract_number].filter(Boolean).join(' · '))}</span>` : ''}</td>
+      <td class="num ${ui.css}">${remaining(a.days)}<span class="sub">via ${a.via === 'contract' ? 'contract' : 'warranty'}</span></td>
       <td><span class="status ${ui.css}">${ui.label}</span></td>
       <td class="actions">
         <button class="small secondary" data-hist="${esc(a.id)}" title="Historiek">⟲</button>
@@ -416,7 +426,7 @@ $('custBtn').onclick = async () => {
 
 /* ---------- asset dialog ---------- */
 const dlg = $('dialog');
-const F = ['hostname','vendor','model','serial','location','owner','warranty','notes'];
+const F = ['hostname','vendor','model','serial','location','owner','warranty','contract_end','contract_type','contract_number','notes'];
 
 function openDialog(id){
   if(!customers.length){ toast('Er is nog geen klant beschikbaar'); return; }
@@ -443,6 +453,7 @@ $('assetForm').addEventListener('submit', async e => {
   e.preventDefault();
   const rec = {customer_id: $('customer').value};
   F.forEach(f => rec[f] = $(f).value.trim());
+  if(!rec.contract_end) rec.contract_end = null;   // empty date must be NULL, not ''
   $('saveBtn').disabled = true;
   try {
     if(state.editId){
@@ -482,7 +493,7 @@ async function showHistory(id){
   $('histDialog').showModal();
   const {data, error} = await sb.from('audit_log').select('*').eq('asset_id', id).order('at', {ascending:false}).limit(50);
   if(error){ $('histLog').textContent = 'Kon historiek niet laden.'; return; }
-  const labels = {customer_id:'klant',hostname:'hostname',vendor:'vendor',model:'model',serial:'serial',location:'locatie',owner:'eigenaar',warranty:'warranty',notes:'notities'};
+  const labels = {customer_id:'klant',hostname:'hostname',vendor:'vendor',model:'model',serial:'serial',location:'locatie',owner:'eigenaar',warranty:'warranty',contract_end:'contract tot',contract_type:'type contract',contract_number:'contractnr',notes:'notities'};
   $('histLog').innerHTML = data.map(r => {
     let what = r.action === 'insert' ? 'aangemaakt' : r.action === 'delete' ? 'verwijderd' : '';
     if(r.action === 'update'){
@@ -497,7 +508,7 @@ async function showHistory(id){
 $('histClose').onclick = () => $('histDialog').close();
 
 /* ---------- CSV ---------- */
-const CSV_COLS = ['customer','hostname','vendor','model','serial','location','owner','warranty','notes'];
+const CSV_COLS = ['customer','hostname','vendor','model','serial','location','owner','warranty','contract_end','contract_type','contract_number','notes'];
 const csvCell = v => { v = String(v ?? ''); return /[";\n\r]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v; };
 
 $('exportBtn').onclick = () => {
@@ -551,6 +562,7 @@ $('importFile').addEventListener('change', async e => {
       const rec = {};
       head.forEach((h,i) => { const k = h === 'klant' ? 'customer' : h; if(CSV_COLS.includes(k)) rec[k] = (r[i] || '').trim(); });
       rec.warranty = normDate(rec.warranty);
+      if('contract_end' in rec) rec.contract_end = normDate(rec.contract_end) || null;
       if(!rec.hostname || !rec.warranty){ skipped++; continue; }
 
       let cust;
