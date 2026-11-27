@@ -27,7 +27,9 @@ header .who{margin-left:auto;font-size:13px;display:flex;align-items:center;gap:
 .card{background:var(--surface);border-radius:10px;padding:16px 20px;box-shadow:var(--shadow);border:2px solid transparent;
   cursor:pointer;text-align:left;color:inherit;font:inherit;width:100%}
 .card:hover{border-color:var(--border)} .card.active{border-color:var(--primary)}
-.card h2{margin:0;font-size:30px} .card p{margin:4px 0 0;color:var(--muted)}
+.card h2{margin:0;font-size:30px} .card p{margin:4px 0 8px;color:var(--muted)}
+.split{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--muted);border-top:1px solid var(--border);padding:4px 0 0;margin-top:4px}
+.split b{color:var(--text)}
 .green{color:var(--green)} .orange{color:var(--orange)} .red{color:var(--red)}
 
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
@@ -109,10 +111,17 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
 <div class="container" id="app" hidden>
 
   <div class="cards">
-    <button class="card active" data-filter="all"><h2 id="totalAssets">0</h2><p>Assets</p></button>
-    <button class="card" data-filter="supported"><h2 class="green" id="supported">0</h2><p>Onder support</p></button>
-    <button class="card" data-filter="expiring"><h2 class="orange" id="expiring">0</h2><p id="expiringLabel">Vervalt binnen 90 dagen</p></button>
-    <button class="card" data-filter="expired"><h2 class="red" id="expired">0</h2><p>Verlopen</p></button>
+    <button class="card active" data-filter="all"><h2 id="totalAssets">0</h2><p>Assets</p>
+      <div class="split"><span>Zonder servicecontract</span><b id="noContract">0</b></div></button>
+    <button class="card" data-filter="supported"><h2 class="green" id="supported">0</h2><p>Gedekt</p>
+      <div class="split"><span>Warranty</span><b id="supportedW">0</b></div>
+      <div class="split"><span>Servicecontract</span><b id="supportedC">0</b></div></button>
+    <button class="card" data-filter="expiring"><h2 class="orange" id="expiring">0</h2><p id="expiringLabel">Vervalt binnen 90 dagen</p>
+      <div class="split"><span>Warranty</span><b id="expiringW">0</b></div>
+      <div class="split"><span>Servicecontract</span><b id="expiringC">0</b></div></button>
+    <button class="card" data-filter="expired"><h2 class="red" id="expired">0</h2><p>Verlopen</p>
+      <div class="split"><span>Warranty</span><b id="expiredW">0</b></div>
+      <div class="split"><span>Servicecontract</span><b id="expiredC">0</b></div></button>
   </div>
 
   <div class="chips" id="chips"></div>
@@ -333,6 +342,13 @@ function render(){
   $('expiring').textContent = scope.filter(a => a.status==='expiring').length;
   $('expired').textContent = scope.filter(a => a.status==='expired').length;
   $('expiringLabel').textContent = `Vervalt binnen ${settings.threshold} dagen`;
+  // breakdown: how many assets fall in each bucket by warranty alone / by contract alone
+  const bucket = (date, st) => date && getStatus(daysLeft(date)) === st;
+  [['supported','supported'],['expiring','expiring'],['expired','expired']].forEach(([id, st]) => {
+    $(id + 'W').textContent = scope.filter(a => bucket(a.warranty, st)).length;
+    $(id + 'C').textContent = scope.filter(a => bucket(a.contract_end, st)).length;
+  });
+  $('noContract').textContent = scope.filter(a => !a.contract_end).length;
   document.querySelectorAll('.card').forEach(c => c.classList.toggle('active', c.dataset.filter === state.filter));
 
   // per-customer chips
