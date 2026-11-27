@@ -62,11 +62,32 @@ td.num{white-space:nowrap} td.actions{white-space:nowrap;text-align:right}
 .status{padding:5px 10px;border-radius:6px;color:#fff;font-weight:bold;font-size:13px;white-space:nowrap}
 .status.green{background:var(--green);color:#fff} .status.orange{background:var(--orange);color:#fff} .status.red{background:var(--red);color:#fff}
 
-/* login */
-#login{max-width:380px;margin:80px auto;background:var(--surface);padding:28px;border-radius:12px;box-shadow:var(--shadow)}
-#login h2{margin-top:0}
-#login input{width:100%;padding:10px;margin:5px 0 14px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font:inherit}
-.err{color:var(--red);font-size:14px;margin:0 0 12px}
+/* auth screens */
+#authBox{max-width:420px;margin:50px auto;padding:0 16px}
+.authview{background:var(--surface);padding:28px;border-radius:12px;box-shadow:var(--shadow)}
+.authview h2{margin-top:0}
+.authview input[type=email],.authview input[type=password],.authview input[type=text]{width:100%;padding:10px;margin:5px 0 14px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font:inherit}
+.authview .check{display:flex;gap:8px;align-items:flex-start;font-weight:normal;margin:0 0 14px}
+.authview .check input{margin-top:3px}
+.authview .links{font-size:14px;margin:16px 0 0;text-align:center;color:var(--muted)}
+.authview p.hint{font-size:13px;color:var(--muted);margin:-8px 0 14px}
+.msg{font-size:14px;margin:0 0 12px;padding:8px 10px;border-radius:6px}
+.msg.err{color:var(--red);border:1px solid var(--red)} .msg.ok{color:var(--green);border:1px solid var(--green)}
+a{color:var(--primary)}
+.badge{background:var(--red);color:#fff;border-radius:10px;padding:1px 7px;font-size:12px;margin-left:4px}
+footer{text-align:center;font-size:13px;color:var(--muted);padding:20px}
+/* admin */
+#adminDialog{width:min(1050px,96vw)}
+#adminBody select{width:auto;margin:4px 0;padding:6px}
+#adminBody .tabs{display:flex;gap:8px;margin-bottom:14px}
+#adminBody .tabs button.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+.chip2{display:inline-block;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:2px 8px;font-size:12px;margin:2px 4px 2px 0}
+.chip2 a{text-decoration:none;color:var(--red);margin-left:4px}
+#adminBody td{font-size:13px}
+.legal{max-height:60vh;overflow:auto;font-size:14px;line-height:1.5}
+.legal h3{margin:18px 0 4px;font-size:15px}
+.radio{display:flex;gap:8px;align-items:center;font-weight:normal;margin:6px 0}
+.radio input{width:auto!important;margin:0!important}
 
 dialog{border:none;border-radius:12px;padding:0;width:min(580px,94vw);background:var(--surface);color:var(--text);box-shadow:0 10px 40px rgba(0,0,0,.35)}
 dialog::backdrop{background:rgba(0,0,0,.5)}
@@ -93,20 +114,79 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
   </div>
   <div class="who" id="who" hidden>
     <span id="whoText"></span>
+    <button class="small" id="adminBtn" hidden>Beheer<span class="badge" id="pendingBadge" hidden></span></button>
+    <button class="secondary small" id="pwBtn">Wachtwoord</button>
     <button class="secondary small" id="logoutBtn">Afmelden</button>
   </div>
 </header>
 
-<!-- ============ LOGIN ============ -->
-<form id="login" hidden>
-  <h2>Aanmelden</h2>
-  <label for="email">E-mail</label>
-  <input type="email" id="email" autocomplete="username" required>
-  <label for="password">Wachtwoord</label>
-  <input type="password" id="password" autocomplete="current-password" required>
-  <p class="err" id="loginErr" hidden></p>
-  <button type="submit" style="width:100%">Aanmelden</button>
-</form>
+<!-- ============ AUTH SCREENS ============ -->
+<div id="authBox" hidden>
+
+  <form class="authview" id="view-login" hidden>
+    <h2>Aanmelden</h2>
+    <label for="email">E-mail</label>
+    <input type="email" id="email" autocomplete="username" required>
+    <label for="password">Wachtwoord</label>
+    <input type="password" id="password" autocomplete="current-password" required>
+    <div data-captcha="login"></div>
+    <p class="msg" id="msg-login" hidden></p>
+    <button type="submit" style="width:100%">Aanmelden</button>
+    <p class="links"><a href="#" data-view="forgot">Wachtwoord vergeten?</a><br>
+      Nog geen account? <a href="#" data-view="signup">Registreer je bedrijf</a></p>
+  </form>
+
+  <form class="authview" id="view-signup" hidden>
+    <h2>Registreren</h2>
+    <label for="su-company">Bedrijfsnaam *</label>
+    <input type="text" id="su-company" maxlength="120" autocomplete="organization" required>
+    <label for="su-email">E-mail *</label>
+    <input type="email" id="su-email" autocomplete="username" required>
+    <label for="su-pw">Wachtwoord * (minstens 10 tekens)</label>
+    <input type="password" id="su-pw" minlength="10" autocomplete="new-password" required>
+    <label for="su-pw2">Herhaal wachtwoord *</label>
+    <input type="password" id="su-pw2" minlength="10" autocomplete="new-password" required>
+    <label class="check"><input type="checkbox" id="su-consent" required>
+      <span>Ik heb de <a href="#" data-legal>privacyverklaring en voorwaarden</a> gelezen en ga akkoord.</span></label>
+    <div data-captcha="signup"></div>
+    <p class="msg" id="msg-signup" hidden></p>
+    <button type="submit" style="width:100%">Account aanvragen</button>
+    <p class="hint" style="margin:12px 0 0">Na bevestiging van je e-mailadres beoordeelt de beheerder je aanvraag.</p>
+    <p class="links"><a href="#" data-view="login">Terug naar aanmelden</a></p>
+  </form>
+
+  <form class="authview" id="view-forgot" hidden>
+    <h2>Wachtwoord vergeten</h2>
+    <p class="hint" style="margin-top:0">Geef je e-mailadres. Je ontvangt een link om een nieuw wachtwoord in te stellen.</p>
+    <label for="fg-email">E-mail</label>
+    <input type="email" id="fg-email" autocomplete="username" required>
+    <div data-captcha="forgot"></div>
+    <p class="msg" id="msg-forgot" hidden></p>
+    <button type="submit" style="width:100%">Link versturen</button>
+    <p class="links"><a href="#" data-view="login">Terug naar aanmelden</a></p>
+  </form>
+
+  <form class="authview" id="view-recovery" hidden>
+    <h2>Nieuw wachtwoord</h2>
+    <label for="rc-pw">Nieuw wachtwoord (minstens 10 tekens)</label>
+    <input type="password" id="rc-pw" minlength="10" autocomplete="new-password" required>
+    <label for="rc-pw2">Herhaal wachtwoord</label>
+    <input type="password" id="rc-pw2" minlength="10" autocomplete="new-password" required>
+    <p class="msg" id="msg-recovery" hidden></p>
+    <button type="submit" style="width:100%">Wachtwoord opslaan</button>
+    <p class="links" id="rc-cancel" hidden><a href="#" id="rc-cancel-link">Annuleren</a></p>
+  </form>
+
+  <div class="authview" id="view-pending" hidden>
+    <h2 id="pendingTitle">Aanvraag in behandeling</h2>
+    <p id="pendingText"></p>
+    <p class="msg" id="msg-pending" hidden></p>
+    <button id="recheckBtn" style="width:100%">Opnieuw controleren</button>
+    <p class="links"><a href="#" id="pendingLogout">Afmelden</a></p>
+  </div>
+</div>
+
+<footer id="footer"><a href="#" data-legal>Privacy &amp; voorwaarden</a></footer>
 
 <div class="container" id="app" hidden>
 
@@ -205,6 +285,40 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
   </div>
 </dialog>
 
+<!-- ============ ADMIN DIALOG ============ -->
+<dialog id="adminDialog">
+  <div class="body">
+    <h2>Beheer</h2>
+    <div id="adminBody">Laden…</div>
+    <div class="dialog-actions" style="margin-top:14px"><button class="secondary" id="adminClose">Sluiten</button></div>
+  </div>
+</dialog>
+
+<!-- ============ APPROVE DIALOG ============ -->
+<dialog id="approveDialog">
+  <form id="approveForm" method="dialog">
+    <h2>Gebruiker goedkeuren</h2>
+    <p id="approveWho" style="margin-top:0"></p>
+    <label class="radio"><input type="radio" name="amode" value="new" checked> Nieuwe klant aanmaken met deze naam:</label>
+    <input type="text" id="approveName" maxlength="120">
+    <label class="radio"><input type="radio" name="amode" value="existing"> Koppelen aan bestaande klant:</label>
+    <select id="approveCust"></select>
+    <div class="dialog-actions">
+      <button type="button" class="secondary" id="approveCancel">Annuleren</button>
+      <button type="submit">Goedkeuren</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ============ PRIVACY DIALOG ============ -->
+<dialog id="legalDialog">
+  <div class="body">
+    <h2>Privacyverklaring &amp; voorwaarden</h2>
+    <div class="legal" id="legalBody"></div>
+    <div class="dialog-actions" style="margin-top:14px"><button class="secondary" id="legalClose">Sluiten</button></div>
+  </div>
+</dialog>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -214,6 +328,11 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
    ===================================================== */
 const SUPABASE_URL = 'https://hhhxcrlcczkwboenkwhx.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhoaHhjcmxjY3prd2JvZW5rd2h4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU2MjA3ODEsImV4cCI6MjExMTE5Njc4MX0.Ym3pj5PE0kTrTENxitVafHA7mDqF7xajNQRIuKpKNQI';
+
+/* ---- fill in before you open sign-up to customers ---- */
+const COMPANY_NAME    = 'Asset_comp';      // legal name of the company running this tracker
+const PRIVACY_CONTACT = 'geert_vercruysse@outlook.com'; // where customers send privacy / deletion requests
+const TURNSTILE_SITEKEY = '';                     // optional: Cloudflare Turnstile site key (CAPTCHA); '' = off
 
 const $ = id => document.getElementById(id);
 const configured = !SUPABASE_URL.includes('YOUR-PROJECT') && !SUPABASE_ANON_KEY.includes('YOUR-ANON');
@@ -265,43 +384,352 @@ function fmtDate(s){
   return d ? d.toLocaleDateString('nl-BE', {day:'2-digit', month:'2-digit', year:'numeric'}) : '—';
 }
 
-/* ---------- auth ---------- */
+/* ---------- captcha (optional, Cloudflare Turnstile) ---------- */
+const captchaTokens = {}, captchaWidgets = {};
+function initCaptcha(){
+  if(!TURNSTILE_SITEKEY) return;
+  const s = document.createElement('script');
+  s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+  s.async = true;
+  s.onload = () => document.querySelectorAll('[data-captcha]').forEach(el => {
+    const v = el.dataset.captcha;
+    captchaWidgets[v] = turnstile.render(el, {
+      sitekey: TURNSTILE_SITEKEY,
+      callback: t => { captchaTokens[v] = t; },
+      'expired-callback': () => { captchaTokens[v] = null; }
+    });
+  });
+  document.head.appendChild(s);
+}
+// returns {ok, token}; ok=false when a captcha is required but not solved yet
+function takeCaptcha(v){
+  if(!TURNSTILE_SITEKEY) return {ok:true, token:undefined};
+  const t = captchaTokens[v];
+  if(!t) return {ok:false};
+  captchaTokens[v] = null;
+  if(window.turnstile && captchaWidgets[v] !== undefined) turnstile.reset(captchaWidgets[v]);
+  return {ok:true, token:t};
+}
+
+/* ---------- auth screens ---------- */
+let recovering = false;
+const pageUrl = () => location.origin + location.pathname;
+
+function setMsg(view, text, kind){
+  const m = $('msg-' + view); if(!m) return;
+  m.textContent = text || ''; m.className = 'msg ' + (kind || 'err'); m.hidden = !text;
+}
+function showView(v, text, kind){
+  $('app').hidden = true; $('who').hidden = true; $('authBox').hidden = false;
+  document.querySelectorAll('.authview').forEach(el => el.hidden = el.id !== 'view-' + v);
+  document.querySelectorAll('.msg').forEach(m => m.hidden = true);
+  if(text) setMsg(v, text, kind);
+}
+function resetState(){
+  me = null; customers = []; assets = [];
+  state = {filter:'all', customer:'', sortKey:'warranty', sortDir:1, editId:null};
+}
+document.querySelectorAll('[data-view]').forEach(a => a.addEventListener('click', e => {
+  e.preventDefault(); showView(a.dataset.view);
+}));
+
 async function boot(){
+  initCaptcha();
   if(!configured){
-    $('login').hidden = false;
-    $('login').innerHTML = '<h2>Nog niet ingesteld</h2><p>Vul bovenaan het script <code>SUPABASE_URL</code> en <code>SUPABASE_ANON_KEY</code> in.</p>';
+    $('authBox').hidden = false;
+    $('authBox').innerHTML = '<div class="authview"><h2>Nog niet ingesteld</h2><p>Vul bovenaan het script <code>SUPABASE_URL</code> en <code>SUPABASE_ANON_KEY</code> in.</p></div>';
     return;
   }
-  const {data} = await sb.auth.getSession();
-  if(data.session) await enter(); else showLogin();
-  sb.auth.onAuthStateChange((ev) => { if(ev === 'SIGNED_OUT') showLogin(); });
+  const hash = new URLSearchParams(location.hash.replace(/^#/, ''));
+  recovering = hash.get('type') === 'recovery';
+  const linkError = hash.get('error_description');
+
+  sb.auth.onAuthStateChange(ev => {           // keep this callback synchronous
+    if(ev === 'PASSWORD_RECOVERY'){ recovering = true; $('rc-cancel').hidden = true; showView('recovery'); }
+    else if(ev === 'SIGNED_OUT'){ recovering = false; resetState(); showView('login'); }
+  });
+
+  const {data} = await sb.auth.getSession();   // lets the client consume the link in the URL first
+  if(location.hash) history.replaceState(null, '', location.pathname + location.search);
+
+  if(linkError) return showView('login', 'Deze link is verlopen of al gebruikt. Vraag hieronder een nieuwe aan via "Wachtwoord vergeten", of meld je aan als je account al bevestigd is.', 'err');
+  if(recovering && data.session){ $('rc-cancel').hidden = true; return showView('recovery'); }
+  if(data.session) await enter(); else showView('login');
 }
-function showLogin(){
-  me = null; customers = []; assets = [];
-  $('app').hidden = true; $('who').hidden = true; $('login').hidden = false;
-}
-$('login').addEventListener('submit', async e => {
+
+$('view-login').addEventListener('submit', async e => {
   e.preventDefault();
-  if(!configured) return;
-  $('loginErr').hidden = true;
-  const {error} = await sb.auth.signInWithPassword({email:$('email').value.trim(), password:$('password').value});
-  if(error){ $('loginErr').textContent = 'Aanmelden mislukt: ' + error.message; $('loginErr').hidden = false; return; }
+  const cap = takeCaptcha('login');
+  if(!cap.ok) return setMsg('login', 'Bevestig eerst de CAPTCHA.');
+  const {error} = await sb.auth.signInWithPassword({
+    email: $('email').value.trim(), password: $('password').value, options:{captchaToken: cap.token}});
+  if(error) return setMsg('login', 'Aanmelden mislukt: ' + error.message);
   $('password').value = '';
   await enter();
 });
+
+$('view-signup').addEventListener('submit', async e => {
+  e.preventDefault();
+  const company = $('su-company').value.trim(), email = $('su-email').value.trim(), pw = $('su-pw').value;
+  if(!company) return setMsg('signup', 'Vul je bedrijfsnaam in.');
+  if(pw.length < 10) return setMsg('signup', 'Het wachtwoord moet minstens 10 tekens hebben.');
+  if(pw !== $('su-pw2').value) return setMsg('signup', 'De wachtwoorden komen niet overeen.');
+  if(!$('su-consent').checked) return setMsg('signup', 'Je moet akkoord gaan met de privacyverklaring.');
+  const cap = takeCaptcha('signup');
+  if(!cap.ok) return setMsg('signup', 'Bevestig eerst de CAPTCHA.');
+  const {data, error} = await sb.auth.signUp({email, password: pw,
+    options:{data:{company}, emailRedirectTo: pageUrl(), captchaToken: cap.token}});
+  if(error) return setMsg('signup', 'Registreren mislukt: ' + error.message);
+  $('su-pw').value = $('su-pw2').value = '';
+  if(data.session) return enter();             // e-mail confirmation switched off in Supabase
+  setMsg('signup', 'Bijna klaar. We stuurden een e-mail naar ' + email + '. Klik op de link in dat bericht om je adres te bevestigen. Daarna beoordeelt de beheerder je aanvraag.', 'ok');
+});
+
+$('view-forgot').addEventListener('submit', async e => {
+  e.preventDefault();
+  const cap = takeCaptcha('forgot');
+  if(!cap.ok) return setMsg('forgot', 'Bevestig eerst de CAPTCHA.');
+  const {error} = await sb.auth.resetPasswordForEmail($('fg-email').value.trim(),
+    {redirectTo: pageUrl(), captchaToken: cap.token});
+  if(error) return setMsg('forgot', 'Versturen mislukt: ' + error.message);
+  setMsg('forgot', 'Als dit adres bij ons bekend is, ontvang je binnen enkele minuten een e-mail met een link.', 'ok');
+});
+
+$('view-recovery').addEventListener('submit', async e => {
+  e.preventDefault();
+  const pw = $('rc-pw').value;
+  if(pw.length < 10) return setMsg('recovery', 'Het wachtwoord moet minstens 10 tekens hebben.');
+  if(pw !== $('rc-pw2').value) return setMsg('recovery', 'De wachtwoorden komen niet overeen.');
+  const {error} = await sb.auth.updateUser({password: pw});
+  if(error) return setMsg('recovery', 'Opslaan mislukt: ' + error.message);
+  $('rc-pw').value = $('rc-pw2').value = '';
+  recovering = false;
+  toast('Wachtwoord gewijzigd');
+  await enter();
+});
+$('pwBtn').onclick = () => { $('rc-cancel').hidden = false; showView('recovery'); };
+$('rc-cancel-link').onclick = e => { e.preventDefault(); enter(); };
+
 $('logoutBtn').onclick = () => sb.auth.signOut();
+$('pendingLogout').onclick = e => { e.preventDefault(); sb.auth.signOut(); };
+$('recheckBtn').onclick = () => enter();
 
 async function enter(){
+  if(recovering) return;
   const {data:{user}} = await sb.auth.getUser();
-  if(!user){ showLogin(); return; }
+  if(!user){ showView('login'); return; }
   const {data:prof, error} = await sb.from('profiles').select('*').eq('id', user.id).single();
   if(error){ fail(error, 'Profiel laden mislukt'); return; }
   me = prof;
+
+  if(me.status !== 'approved'){
+    if(me.status === 'rejected'){
+      $('pendingTitle').textContent = 'Toegang geweigerd';
+      $('pendingText').textContent = 'Je aanvraag werd niet goedgekeurd. Neem contact op met ' + COMPANY_NAME + ' als dit een vergissing is.';
+    } else {
+      $('pendingTitle').textContent = 'Aanvraag in behandeling';
+      $('pendingText').textContent = 'Bedankt' + (me.company ? ', ' + me.company : '') + '. Je e-mailadres is bevestigd en je aanvraag wacht op goedkeuring door de beheerder. Je kan later terugkomen en opnieuw controleren.';
+    }
+    showView('pending');
+    return;
+  }
+
   $('whoText').textContent = `${me.email} (${me.role === 'admin' ? 'admin' : 'engineer'})`;
-  $('who').hidden = false; $('login').hidden = true; $('app').hidden = false;
+  $('authBox').hidden = true; $('who').hidden = false; $('app').hidden = false;
   $('custBtn').hidden = me.role !== 'admin';
+  $('adminBtn').hidden = me.role !== 'admin';
   await loadAll();
+  if(me.role === 'admin') refreshBadge();
 }
+
+/* ---------- admin tools ---------- */
+let adm = {profiles:[], access:[], tab:'users'};
+let approveFor = null;
+
+async function refreshBadge(){
+  const {count} = await sb.from('profiles').select('id', {count:'exact', head:true}).eq('status', 'pending');
+  const b = $('pendingBadge'); b.textContent = count || ''; b.hidden = !count;
+}
+async function loadAdmin(){
+  const [p, a] = await Promise.all([
+    sb.from('profiles').select('*').order('created_at', {ascending:false}),
+    sb.from('customer_access').select('*')]);
+  const err = p.error || a.error;
+  if(err){ $('adminBody').textContent = 'Laden mislukt: ' + err.message; return; }
+  adm.profiles = p.data; adm.access = a.data;
+  renderAdmin(); refreshBadge();
+}
+$('adminBtn').onclick = async () => { $('adminBody').textContent = 'Laden…'; $('adminDialog').showModal(); await loadAdmin(); };
+$('adminClose').onclick = () => $('adminDialog').close();
+
+const USER_STATUS = {pending:['In afwachting','orange'], approved:['Goedgekeurd','green'], rejected:['Geweigerd','red']};
+
+function renderAdmin(){
+  const pend = adm.profiles.filter(p => p.status === 'pending').length;
+  let html = `<div class="tabs">
+    <button class="secondary small ${adm.tab==='users'?'on':''}" data-tab="users">Gebruikers${pend ? ` <span class="badge">${pend}</span>` : ''}</button>
+    <button class="secondary small ${adm.tab==='customers'?'on':''}" data-tab="customers">Klanten</button></div>`;
+
+  if(adm.tab === 'users'){
+    const order = {pending:0, rejected:1, approved:2};
+    const users = [...adm.profiles].sort((a,b) => order[a.status]-order[b.status] || a.email.localeCompare(b.email));
+    html += `<div class="table-wrap"><table><thead><tr><th>E-mail</th><th>Bedrijf</th><th>Rol</th><th>Status</th><th>Klanten</th><th></th></tr></thead><tbody>` +
+      users.map(u => {
+        const self = u.id === me.id;
+        const links = adm.access.filter(x => x.user_id === u.id);
+        const chips = links.map(l => `<span class="chip2">${esc(custName(l.customer_id))}<a href="#" data-act="unlink" data-u="${esc(u.id)}" data-c="${esc(l.customer_id)}" title="Ontkoppel">✕</a></span>`).join('') || '<span class="sub">geen</span>';
+        const free = customers.filter(c => !links.some(l => l.customer_id === c.id));
+        const sel = free.length ? `<select data-linksel="${esc(u.id)}"><option value="">+ Koppel klant…</option>${free.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('')}</select>` : '';
+        const [stLabel, stCss] = USER_STATUS[u.status] || [u.status, 'orange'];
+        const btns = [];
+        if(u.status !== 'approved') btns.push(`<button class="small" data-act="approve" data-u="${esc(u.id)}">Goedkeuren</button>`);
+        if(!self && u.status === 'pending') btns.push(`<button class="small secondary" data-act="reject" data-u="${esc(u.id)}">Weigeren</button>`);
+        if(!self && u.status === 'approved') btns.push(`<button class="small secondary" data-act="reject" data-u="${esc(u.id)}">Blokkeren</button>`);
+        if(!self && u.status === 'approved') btns.push(`<button class="small secondary" data-act="role" data-u="${esc(u.id)}" data-role="${u.role === 'admin' ? 'engineer' : 'admin'}">${u.role === 'admin' ? 'Admin afnemen' : 'Maak admin'}</button>`);
+        if(!self) btns.push(`<button class="small danger" data-act="deluser" data-u="${esc(u.id)}">Verwijder</button>`);
+        return `<tr><td><strong>${esc(u.email)}</strong><span class="sub">${fmtDate((u.created_at||'').slice(0,10))}</span></td>
+          <td>${esc(u.company) || '—'}</td><td>${u.role === 'admin' ? 'admin' : 'engineer'}</td>
+          <td><span class="status ${stCss}">${stLabel}</span></td><td>${chips}<br>${sel}</td>
+          <td class="actions" style="white-space:normal">${btns.join(' ')}</td></tr>`;
+      }).join('') + `</tbody></table></div>`;
+  } else {
+    html += `<div class="table-wrap"><table><thead><tr><th>Klant</th><th>Assets</th><th>Gebruikers</th><th></th></tr></thead><tbody>` +
+      customers.map(c => {
+        const n = assets.filter(a => a.customer_id === c.id).length;
+        const users = adm.access.filter(x => x.customer_id === c.id).map(x => (adm.profiles.find(p => p.id === x.user_id) || {}).email).filter(Boolean);
+        return `<tr><td><strong>${esc(c.name)}</strong></td><td>${n}</td><td>${users.map(esc).join('<br>') || '<span class="sub">geen</span>'}</td>
+          <td class="actions"><button class="small secondary" data-act="rename" data-c="${esc(c.id)}">Hernoem</button>
+          <button class="small danger" data-act="delcust" data-c="${esc(c.id)}">Verwijder…</button></td></tr>`;
+      }).join('') + `</tbody></table></div>
+      <p class="sub">Een klant verwijderen wist ook alle assets en de historiek van die klant. Gebruikt voor verzoeken tot gegevenswissing.</p>`;
+  }
+  $('adminBody').innerHTML = html;
+}
+
+async function adminCall(fn, args, okMsg){
+  const {error} = await sb.rpc(fn, args);
+  if(error){ fail(error, 'Actie mislukt'); return false; }
+  if(okMsg) toast(okMsg);
+  return true;
+}
+$('adminBody').addEventListener('change', async e => {
+  const sel = e.target.closest('[data-linksel]');
+  if(!sel || !sel.value) return;
+  const {error} = await sb.from('customer_access').insert({user_id: sel.dataset.linksel, customer_id: sel.value});
+  if(error) return fail(error, 'Koppelen mislukt');
+  toast('Klant gekoppeld'); loadAdmin();
+});
+$('adminBody').addEventListener('click', async e => {
+  const tab = e.target.closest('[data-tab]');
+  if(tab){ adm.tab = tab.dataset.tab; renderAdmin(); return; }
+  const t = e.target.closest('[data-act]'); if(!t) return;
+  e.preventDefault();
+  const act = t.dataset.act, u = t.dataset.u, c = t.dataset.c;
+  const prof = adm.profiles.find(p => p.id === u);
+
+  if(act === 'unlink'){
+    const {error} = await sb.from('customer_access').delete().eq('user_id', u).eq('customer_id', c);
+    if(error) return fail(error, 'Ontkoppelen mislukt');
+    toast('Klant ontkoppeld'); loadAdmin();
+  }
+  else if(act === 'approve'){
+    approveFor = u;
+    $('approveWho').textContent = `${prof.email}${prof.company ? ' – ' + prof.company : ''}`;
+    $('approveName').value = prof.company || '';
+    $('approveCust').innerHTML = customers.map(x => `<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('');
+    document.querySelector('input[name=amode][value=new]').checked = true;
+    $('approveDialog').showModal();
+  }
+  else if(act === 'reject'){
+    if(await adminCall('admin_set_status', {p_user:u, p_status:'rejected'}, 'Status bijgewerkt')) loadAdmin();
+  }
+  else if(act === 'role'){
+    if(await adminCall('admin_set_role', {p_user:u, p_role:t.dataset.role}, 'Rol bijgewerkt')) loadAdmin();
+  }
+  else if(act === 'deluser'){
+    if(!confirm(`${prof.email} definitief verwijderen? De login verdwijnt. De assets van de klant blijven bestaan.`)) return;
+    if(await adminCall('admin_delete_user', {p_user:u}, 'Gebruiker verwijderd')) loadAdmin();
+  }
+  else if(act === 'rename'){
+    const cur = customers.find(x => x.id === c);
+    const name = (prompt('Nieuwe naam voor deze klant:', cur.name) || '').trim();
+    if(!name || name === cur.name) return;
+    const {error} = await sb.from('customers').update({name}).eq('id', c);
+    if(error) return fail(error, 'Hernoemen mislukt');
+    toast('Klant hernoemd'); await loadAll(); loadAdmin();
+  }
+  else if(act === 'delcust'){
+    const cur = customers.find(x => x.id === c);
+    const n = assets.filter(a => a.customer_id === c).length;
+    const typed = prompt(`Dit verwijdert "${cur.name}" met ${n} asset(s) en de volledige historiek. Dit kan niet ongedaan gemaakt worden.\n\nTyp de naam van de klant om te bevestigen:`);
+    if(typed === null) return;
+    if(typed.trim() !== cur.name) return toast('Naam komt niet overeen, niets verwijderd');
+    if(await adminCall('admin_delete_customer', {p_customer:c}, 'Klant verwijderd')){
+      if(state.customer === c) state.customer = '';
+      await loadAll(); loadAdmin();
+    }
+  }
+});
+
+$('approveCancel').onclick = () => $('approveDialog').close();
+$('approveForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const mode = document.querySelector('input[name=amode]:checked').value;
+  const args = {p_user: approveFor, p_customer: null, p_new_name: null};
+  if(mode === 'existing') args.p_customer = $('approveCust').value;
+  else {
+    args.p_new_name = $('approveName').value.trim();
+    if(!args.p_new_name) return toast('Geef een klantnaam in');
+  }
+  if(await adminCall('admin_approve_user', args, 'Gebruiker goedgekeurd')){
+    $('approveDialog').close(); await loadAll(); loadAdmin();
+  }
+});
+
+/* ---------- privacy notice & terms ---------- */
+function renderLegal(){
+  const unset = COMPANY_NAME.includes('JOUW') || PRIVACY_CONTACT.includes('jouwbedrijf');
+  const co = esc(COMPANY_NAME), mail = esc(PRIVACY_CONTACT);
+  $('legalBody').innerHTML = `
+    ${unset ? '<p class="msg err">Beheerder: vul <code>COMPANY_NAME</code> en <code>PRIVACY_CONTACT</code> in bovenaan het script voor je dit publiceert.</p>' : ''}
+    <h3>1. Wie is verantwoordelijk?</h3>
+    <p>${co} (hierna "wij") beheert deze Infrastructure Lifecycle Tracker en is verantwoordelijk voor de verwerking van je persoonsgegevens. Contact: <a href="mailto:${mail}">${mail}</a>.</p>
+    <h3>2. Welke gegevens verwerken we?</h3>
+    <ul>
+      <li><strong>Account:</strong> e-mailadres, bedrijfsnaam en je (versleutelde) wachtwoord.</li>
+      <li><strong>Assetgegevens die je zelf invoert:</strong> hostname, fabrikant, model, serienummer, locatie, contactpersoon, garantie- en contractgegevens en notities.</li>
+      <li><strong>Wijzigingshistoriek:</strong> wie welke asset wanneer heeft toegevoegd, gewijzigd of verwijderd (e-mailadres en tijdstip).</li>
+    </ul>
+    <p>Voer geen wachtwoorden, toegangssleutels of andere gevoelige gegevens in, ook niet in het notitieveld.</p>
+    <h3>3. Waarvoor gebruiken we ze?</h3>
+    <p>Om je toegang te geven tot de tracker, je assets en hun garantie- en contractstatus bij te houden, je aanvraag te beoordelen, het systeem te beveiligen en wijzigingen te kunnen nagaan. Rechtsgrond: uitvoering van de overeenkomst met jou of je organisatie en ons gerechtvaardigd belang om de dienst veilig en betrouwbaar te houden.</p>
+    <h3>4. Wie ziet je gegevens?</h3>
+    <p>Gebruikers van jouw organisatie zien alleen de gegevens van hun eigen organisatie. Beheerders van ${co} kunnen alle gegevens zien. We verkopen je gegevens niet en gebruiken ze niet voor reclame.</p>
+    <h3>5. Verwerkers en bewaring</h3>
+    <ul>
+      <li>Supabase (database en aanmelding), regio Europese Unie (Frankfurt).</li>
+      <li>GitHub Pages (hosting van deze webpagina). Hierop staan geen klantgegevens.</li>
+      <li>Een e-mailprovider voor bevestigings- en herstelmails.</li>
+      ${TURNSTILE_SITEKEY ? '<li>Cloudflare Turnstile (CAPTCHA tegen misbruik).</li>' : ''}
+    </ul>
+    <p>We bewaren je gegevens zolang je account of de overeenkomst loopt. Op verzoek wissen we je account en de gegevens van je organisatie.</p>
+    <h3>6. Je rechten</h3>
+    <p>Je kan inzage, verbetering, wissing, beperking, overdraagbaarheid en bezwaar vragen via <a href="mailto:${mail}">${mail}</a>. Je kan ook klacht indienen bij de toezichthoudende autoriteit, in België de Gegevensbeschermingsautoriteit (gegevensbeschermingsautoriteit.be). Je kan je assets zelf exporteren als CSV.</p>
+    <h3>7. Cookies en lokale opslag</h3>
+    <p>We gebruiken enkel technisch noodzakelijke opslag in je browser om je aangemeld te houden en je instellingen te onthouden. Geen tracking of reclamecookies.</p>
+    <h3>8. Voorwaarden van gebruik</h3>
+    <ul>
+      <li>Je mag enkel gegevens invoeren waarvoor je zelf bevoegd bent.</li>
+      <li>Je houdt je inloggegevens geheim en deelt je account niet.</li>
+      <li>Wij kunnen een account weigeren, blokkeren of verwijderen bij misbruik.</li>
+      <li>De dienst wordt aangeboden zonder garantie op beschikbaarheid of juistheid van de getoonde status. Controleer belangrijke vervaldata altijd bij je leverancier. Maak zelf regelmatig een CSV-export als back-up.</li>
+      <li>Per klant kunnen maximaal 1000 assets worden opgeslagen.</li>
+    </ul>`;
+}
+document.querySelectorAll('[data-legal]').forEach(a => a.addEventListener('click', e => {
+  e.preventDefault(); renderLegal(); $('legalDialog').showModal();
+}));
+$('legalClose').onclick = () => $('legalDialog').close();
 
 /* ---------- data ---------- */
 async function fetchAll(table, order){
