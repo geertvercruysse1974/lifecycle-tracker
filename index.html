@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -113,13 +113,13 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
   <svg class="logo" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#1f2937"/><rect x="12" y="13" width="40" height="11" rx="3" fill="#f1f5f9"/><rect x="12" y="27" width="40" height="11" rx="3" fill="#f1f5f9"/><rect x="12" y="41" width="40" height="11" rx="3" fill="#f1f5f9"/><circle cx="45" cy="18.5" r="3" fill="#16a34a"/><circle cx="45" cy="32.5" r="3" fill="#ea580c"/><circle cx="45" cy="46.5" r="3" fill="#dc2626"/><rect x="17" y="16.5" width="14" height="4" rx="2" fill="#94a3b8"/><rect x="17" y="30.5" width="14" height="4" rx="2" fill="#94a3b8"/><rect x="17" y="44.5" width="14" height="4" rx="2" fill="#94a3b8"/></svg>
   <div>
     <h1>Infrastructure Lifecycle Tracker</h1>
-    <p>Dell, HPE, NetApp, VMware, Veeam en andere assets</p>
+    <p>Dell, HPE, NetApp, VMware, Veeam and other assets</p>
   </div>
   <div class="who" id="who" hidden>
     <span id="whoText"></span>
-    <button class="small" id="adminBtn" hidden>Beheer<span class="badge" id="pendingBadge" hidden></span></button>
-    <button class="secondary small" id="pwBtn">Wachtwoord</button>
-    <button class="secondary small" id="logoutBtn">Afmelden</button>
+    <button class="small" id="adminBtn" hidden>Admin<span class="badge" id="pendingBadge" hidden></span></button>
+    <button class="secondary small" id="pwBtn">Password</button>
+    <button class="secondary small" id="logoutBtn">Sign out</button>
   </div>
 </header>
 
@@ -127,100 +127,100 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
 <div id="authBox" hidden>
 
   <form class="authview" id="view-login" hidden>
-    <h2>Aanmelden</h2>
-    <label for="email">E-mail</label>
+    <h2>Sign in</h2>
+    <label for="email">Email</label>
     <input type="email" id="email" autocomplete="username" required>
-    <label for="password">Wachtwoord</label>
+    <label for="password">Password</label>
     <input type="password" id="password" autocomplete="current-password" required>
     <div data-captcha="login"></div>
     <p class="msg" id="msg-login" hidden></p>
-    <button type="submit" style="width:100%">Aanmelden</button>
-    <p class="links"><a href="#" data-view="forgot">Wachtwoord vergeten?</a><br>
-      Nog geen account? <a href="#" data-view="signup">Registreer je bedrijf</a></p>
+    <button type="submit" style="width:100%">Sign in</button>
+    <p class="links"><a href="#" data-view="forgot">Forgot password?</a><br>
+      No account yet? <a href="#" data-view="signup">Register your company</a></p>
   </form>
 
   <form class="authview" id="view-signup" hidden>
-    <h2>Registreren</h2>
-    <label for="su-company">Bedrijfsnaam *</label>
+    <h2>Register</h2>
+    <label for="su-company">Company name *</label>
     <input type="text" id="su-company" maxlength="120" autocomplete="organization" required>
-    <label for="su-email">E-mail *</label>
+    <label for="su-email">Email *</label>
     <input type="email" id="su-email" autocomplete="username" required>
-    <label for="su-pw">Wachtwoord * (minstens 10 tekens)</label>
+    <label for="su-pw">Password * (at least 10 characters)</label>
     <input type="password" id="su-pw" minlength="10" autocomplete="new-password" required>
-    <label for="su-pw2">Herhaal wachtwoord *</label>
+    <label for="su-pw2">Repeat password *</label>
     <input type="password" id="su-pw2" minlength="10" autocomplete="new-password" required>
     <label class="check"><input type="checkbox" id="su-consent" required>
-      <span>Ik heb de <a href="#" data-legal>privacyverklaring en voorwaarden</a> gelezen en ga akkoord.</span></label>
+      <span>I have read and agree to the <a href="#" data-legal>privacy notice and terms</a>.</span></label>
     <div data-captcha="signup"></div>
     <p class="msg" id="msg-signup" hidden></p>
-    <button type="submit" style="width:100%">Account aanvragen</button>
-    <p class="hint" style="margin:12px 0 0">Na bevestiging van je e-mailadres beoordeelt de beheerder je aanvraag.</p>
-    <p class="links"><a href="#" data-view="login">Terug naar aanmelden</a></p>
+    <button type="submit" style="width:100%">Request account</button>
+    <p class="hint" style="margin:12px 0 0">After you confirm your email address, the administrator will review your request.</p>
+    <p class="links"><a href="#" data-view="login">Back to sign in</a></p>
   </form>
 
   <form class="authview" id="view-forgot" hidden>
-    <h2>Wachtwoord vergeten</h2>
-    <p class="hint" style="margin-top:0">Geef je e-mailadres. Je ontvangt een link om een nieuw wachtwoord in te stellen.</p>
-    <label for="fg-email">E-mail</label>
+    <h2>Forgot password</h2>
+    <p class="hint" style="margin-top:0">Enter your email address. You will receive a link to set a new password.</p>
+    <label for="fg-email">Email</label>
     <input type="email" id="fg-email" autocomplete="username" required>
     <div data-captcha="forgot"></div>
     <p class="msg" id="msg-forgot" hidden></p>
-    <button type="submit" style="width:100%">Link versturen</button>
-    <p class="links"><a href="#" data-view="login">Terug naar aanmelden</a></p>
+    <button type="submit" style="width:100%">Send link</button>
+    <p class="links"><a href="#" data-view="login">Back to sign in</a></p>
   </form>
 
   <form class="authview" id="view-recovery" hidden>
-    <h2>Nieuw wachtwoord</h2>
-    <label for="rc-pw">Nieuw wachtwoord (minstens 10 tekens)</label>
+    <h2>New password</h2>
+    <label for="rc-pw">New password (at least 10 characters)</label>
     <input type="password" id="rc-pw" minlength="10" autocomplete="new-password" required>
-    <label for="rc-pw2">Herhaal wachtwoord</label>
+    <label for="rc-pw2">Repeat password</label>
     <input type="password" id="rc-pw2" minlength="10" autocomplete="new-password" required>
     <p class="msg" id="msg-recovery" hidden></p>
-    <button type="submit" style="width:100%">Wachtwoord opslaan</button>
-    <p class="links" id="rc-cancel" hidden><a href="#" id="rc-cancel-link">Annuleren</a></p>
+    <button type="submit" style="width:100%">Save password</button>
+    <p class="links" id="rc-cancel" hidden><a href="#" id="rc-cancel-link">Cancel</a></p>
   </form>
 
   <div class="authview" id="view-pending" hidden>
-    <h2 id="pendingTitle">Aanvraag in behandeling</h2>
+    <h2 id="pendingTitle">Request pending</h2>
     <p id="pendingText"></p>
     <p class="msg" id="msg-pending" hidden></p>
-    <button id="recheckBtn" style="width:100%">Opnieuw controleren</button>
-    <p class="links"><a href="#" id="pendingLogout">Afmelden</a></p>
+    <button id="recheckBtn" style="width:100%">Check again</button>
+    <p class="links"><a href="#" id="pendingLogout">Sign out</a></p>
   </div>
 </div>
 
-<footer id="footer"><a href="#" data-legal>Privacy &amp; voorwaarden</a></footer>
+<footer id="footer"><a href="#" data-legal>Privacy &amp; terms</a></footer>
 
 <div class="container" id="app" hidden>
 
   <div class="cards">
     <button class="card active" data-filter="all"><h2 id="totalAssets">0</h2><p>Assets</p>
-      <div class="split"><span>Zonder servicecontract</span><b id="noContract">0</b></div></button>
-    <button class="card" data-filter="supported"><h2 class="green" id="supported">0</h2><p>Gedekt</p>
+      <div class="split"><span>Without service contract</span><b id="noContract">0</b></div></button>
+    <button class="card" data-filter="supported"><h2 class="green" id="supported">0</h2><p>Covered</p>
       <div class="split"><span>Warranty</span><b id="supportedW">0</b></div>
-      <div class="split"><span>Servicecontract</span><b id="supportedC">0</b></div></button>
-    <button class="card" data-filter="expiring"><h2 class="orange" id="expiring">0</h2><p id="expiringLabel">Vervalt binnen 90 dagen</p>
+      <div class="split"><span>Service contract</span><b id="supportedC">0</b></div></button>
+    <button class="card" data-filter="expiring"><h2 class="orange" id="expiring">0</h2><p id="expiringLabel">Expires within 90 days</p>
       <div class="split"><span>Warranty</span><b id="expiringW">0</b></div>
-      <div class="split"><span>Servicecontract</span><b id="expiringC">0</b></div></button>
-    <button class="card" data-filter="expired"><h2 class="red" id="expired">0</h2><p>Verlopen</p>
+      <div class="split"><span>Service contract</span><b id="expiringC">0</b></div></button>
+    <button class="card" data-filter="expired"><h2 class="red" id="expired">0</h2><p>Expired</p>
       <div class="split"><span>Warranty</span><b id="expiredW">0</b></div>
-      <div class="split"><span>Servicecontract</span><b id="expiredC">0</b></div></button>
+      <div class="split"><span>Service contract</span><b id="expiredC">0</b></div></button>
   </div>
 
   <div class="chips" id="chips"></div>
 
   <div class="toolbar">
-    <input class="search" type="search" id="search" placeholder="Zoek op hostname, model, serial, locatie, eigenaar…">
-    <select id="vendorFilter"><option value="">Alle vendors</option></select>
-    <label for="threshold" style="font-weight:normal">Waarschuwing:</label>
+    <input class="search" type="search" id="search" placeholder="Search hostname, model, serial, location, owner…">
+    <select id="vendorFilter"><option value="">All vendors</option></select>
+    <label for="threshold" style="font-weight:normal">Warning window:</label>
     <select id="threshold">
-      <option value="30">30 dagen</option><option value="60">60 dagen</option>
-      <option value="90" selected>90 dagen</option><option value="180">180 dagen</option>
-      <option value="365">365 dagen</option>
+      <option value="30">30 days</option><option value="60">60 days</option>
+      <option value="90" selected>90 days</option><option value="180">180 days</option>
+      <option value="365">365 days</option>
     </select>
     <span class="spacer"></span>
-    <button id="addBtn">+ Asset toevoegen</button>
-    <button class="secondary" id="custBtn" hidden>+ Klant</button>
+    <button id="addBtn">+ Add asset</button>
+    <button class="secondary" id="custBtn" hidden>+ Customer</button>
     <button class="secondary" id="exportBtn">Export CSV</button>
     <label class="btn secondary" style="font-weight:normal">Import CSV
       <input type="file" id="importFile" accept=".csv,text/csv" hidden>
@@ -230,15 +230,15 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
   <div class="table-wrap">
     <table>
       <thead><tr>
-        <th class="sortable" data-sort="customer_name">Klant</th>
+        <th class="sortable" data-sort="customer_name">Customer</th>
         <th class="sortable" data-sort="hostname">Hostname</th>
         <th class="sortable" data-sort="vendor">Vendor</th>
         <th class="sortable" data-sort="model">Model</th>
         <th class="sortable" data-sort="serial">Serial</th>
-        <th class="sortable" data-sort="location">Locatie / Eigenaar</th>
-        <th class="sortable" data-sort="warranty">Warranty tot</th>
-        <th class="sortable" data-sort="contract_end">Contract tot</th>
-        <th class="sortable" data-sort="days">Resterend</th>
+        <th class="sortable" data-sort="location">Location / Owner</th>
+        <th class="sortable" data-sort="warranty">Warranty until</th>
+        <th class="sortable" data-sort="contract_end">Contract until</th>
+        <th class="sortable" data-sort="days">Remaining</th>
         <th>Status</th><th></th>
       </tr></thead>
       <tbody id="assetTable"></tbody>
@@ -250,31 +250,31 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
 <!-- ============ ASSET DIALOG ============ -->
 <dialog id="dialog">
   <form id="assetForm" method="dialog">
-    <h2 id="dialogTitle">Asset toevoegen</h2>
+    <h2 id="dialogTitle">Add asset</h2>
     <div class="grid">
       <div class="full">
-        <label for="customer">Klant *</label>
+        <label for="customer">Customer *</label>
         <select id="customer" required></select>
       </div>
       <div><label for="hostname">Hostname *</label><input type="text" id="hostname" required></div>
       <div>
         <label for="vendor">Vendor</label>
-        <select id="vendor"><option>Dell</option><option>HPE</option><option>NetApp</option><option>VMware</option><option>Veeam</option><option>Andere</option></select>
+        <select id="vendor"><option>Dell</option><option>HPE</option><option>NetApp</option><option>VMware</option><option>Veeam</option><option>Other</option></select>
       </div>
       <div><label for="model">Model</label><input type="text" id="model"></div>
-      <div><label for="serial">Serienummer</label><input type="text" id="serial"></div>
-      <div class="full warn" id="dupWarn">Let op: dit serienummer bestaat al bij deze klant.</div>
-      <div><label for="location">Locatie</label><input type="text" id="location" placeholder="bv. DC1 – Rack 12"></div>
-      <div><label for="owner">Eigenaar / contact</label><input type="text" id="owner"></div>
-      <div><label for="warranty">Warranty einddatum *</label><input type="date" id="warranty" required></div>
-      <div><label for="contract_end">Servicecontract einddatum</label><input type="date" id="contract_end"></div>
-      <div><label for="contract_type">Type servicecontract</label><input type="text" id="contract_type" placeholder="bv. ProSupport, Foundation Care"></div>
-      <div><label for="contract_number">Contractnummer</label><input type="text" id="contract_number"></div>
-      <div class="full"><label for="notes">Notities</label><textarea id="notes" rows="3" placeholder="Verlengingsstatus, offertenummer, …"></textarea></div>
+      <div><label for="serial">Serial number</label><input type="text" id="serial"></div>
+      <div class="full warn" id="dupWarn">Note: this serial number already exists for this customer.</div>
+      <div><label for="location">Location</label><input type="text" id="location" placeholder="e.g. DC1 – Rack 12"></div>
+      <div><label for="owner">Owner / contact</label><input type="text" id="owner"></div>
+      <div><label for="warranty">Warranty end date *</label><input type="date" id="warranty" required></div>
+      <div><label for="contract_end">Service contract end date</label><input type="date" id="contract_end"></div>
+      <div><label for="contract_type">Service contract type</label><input type="text" id="contract_type" placeholder="e.g. ProSupport, Foundation Care"></div>
+      <div><label for="contract_number">Contract number</label><input type="text" id="contract_number"></div>
+      <div class="full"><label for="notes">Notes</label><textarea id="notes" rows="3" placeholder="Renewal status, quote number, …"></textarea></div>
     </div>
     <div class="dialog-actions">
-      <button type="button" class="secondary" id="cancelBtn">Annuleren</button>
-      <button type="submit" id="saveBtn">Opslaan</button>
+      <button type="button" class="secondary" id="cancelBtn">Cancel</button>
+      <button type="submit" id="saveBtn">Save</button>
     </div>
   </form>
 </dialog>
@@ -282,33 +282,33 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
 <!-- ============ HISTORY DIALOG ============ -->
 <dialog id="histDialog">
   <div class="body">
-    <h2 id="histTitle">Historiek</h2>
+    <h2 id="histTitle">History</h2>
     <div class="log" id="histLog"></div>
-    <div class="dialog-actions" style="margin-top:14px"><button class="secondary" id="histClose">Sluiten</button></div>
+    <div class="dialog-actions" style="margin-top:14px"><button class="secondary" id="histClose">Close</button></div>
   </div>
 </dialog>
 
 <!-- ============ ADMIN DIALOG ============ -->
 <dialog id="adminDialog">
   <div class="body">
-    <h2>Beheer</h2>
-    <div id="adminBody">Laden…</div>
-    <div class="dialog-actions" style="margin-top:14px"><button class="secondary" id="adminClose">Sluiten</button></div>
+    <h2>Administration</h2>
+    <div id="adminBody">Loading…</div>
+    <div class="dialog-actions" style="margin-top:14px"><button class="secondary" id="adminClose">Close</button></div>
   </div>
 </dialog>
 
 <!-- ============ APPROVE DIALOG ============ -->
 <dialog id="approveDialog">
   <form id="approveForm" method="dialog">
-    <h2>Gebruiker goedkeuren</h2>
+    <h2>Approve user</h2>
     <p id="approveWho" style="margin-top:0"></p>
-    <label class="radio"><input type="radio" name="amode" value="new" checked> Nieuwe klant aanmaken met deze naam:</label>
+    <label class="radio"><input type="radio" name="amode" value="new" checked> Create a new customer with this name:</label>
     <input type="text" id="approveName" maxlength="120">
-    <label class="radio"><input type="radio" name="amode" value="existing"> Koppelen aan bestaande klant:</label>
+    <label class="radio"><input type="radio" name="amode" value="existing"> Link to an existing customer:</label>
     <select id="approveCust"></select>
     <div class="dialog-actions">
-      <button type="button" class="secondary" id="approveCancel">Annuleren</button>
-      <button type="submit">Goedkeuren</button>
+      <button type="button" class="secondary" id="approveCancel">Cancel</button>
+      <button type="submit">Approve</button>
     </div>
   </form>
 </dialog>
@@ -316,9 +316,9 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
 <!-- ============ PRIVACY DIALOG ============ -->
 <dialog id="legalDialog">
   <div class="body">
-    <h2>Privacyverklaring &amp; voorwaarden</h2>
+    <h2>Privacy notice &amp; terms</h2>
     <div class="legal" id="legalBody"></div>
-    <div class="dialog-actions" style="margin-top:14px"><button class="secondary" id="legalClose">Sluiten</button></div>
+    <div class="dialog-actions" style="margin-top:14px"><button class="secondary" id="legalClose">Close</button></div>
   </div>
 </dialog>
 
@@ -374,17 +374,17 @@ function getStatus(days){
   if(days === null || days < 0) return 'expired';
   return days <= settings.threshold ? 'expiring' : 'supported';
 }
-const STATUS_UI = {supported:{label:'Actief',css:'green'}, expiring:{label:'Binnenkort',css:'orange'}, expired:{label:'Verlopen',css:'red'}};
+const STATUS_UI = {supported:{label:'Active',css:'green'}, expiring:{label:'Expiring soon',css:'orange'}, expired:{label:'Expired',css:'red'}};
 function remaining(d){
   if(d === null) return '—';
-  if(d < 0) return `${-d} d verlopen`;
-  if(d === 0) return 'Vandaag';
-  if(d >= 365) return `${(d/365).toFixed(1).replace('.', ',')} jaar`;
+  if(d < 0) return `${-d} d overdue`;
+  if(d === 0) return 'Today';
+  if(d >= 365) return `${(d/365).toFixed(1)} yr`;
   return `${d} d`;
 }
 function fmtDate(s){
   const d = parseDate(s);
-  return d ? d.toLocaleDateString('nl-BE', {day:'2-digit', month:'2-digit', year:'numeric'}) : '—';
+  return d ? d.toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit', year:'numeric'}) : '—';
 }
 
 /* ---------- captcha (optional, Cloudflare Turnstile) ---------- */
@@ -440,7 +440,7 @@ async function boot(){
   initCaptcha();
   if(!configured){
     $('authBox').hidden = false;
-    $('authBox').innerHTML = '<div class="authview"><h2>Nog niet ingesteld</h2><p>Vul bovenaan het script <code>SUPABASE_URL</code> en <code>SUPABASE_ANON_KEY</code> in.</p></div>';
+    $('authBox').innerHTML = '<div class="authview"><h2>Not configured yet</h2><p>Fill in <code>SUPABASE_URL</code> and <code>SUPABASE_ANON_KEY</code> at the top of the script.</p></div>';
     return;
   }
   const hash = new URLSearchParams(location.hash.replace(/^#/, ''));
@@ -455,7 +455,7 @@ async function boot(){
   const {data} = await sb.auth.getSession();   // lets the client consume the link in the URL first
   if(location.hash) history.replaceState(null, '', location.pathname + location.search);
 
-  if(linkError) return showView('login', 'Deze link is verlopen of al gebruikt. Vraag hieronder een nieuwe aan via "Wachtwoord vergeten", of meld je aan als je account al bevestigd is.', 'err');
+  if(linkError) return showView('login', 'This link has expired or was already used. Request a new one below via "Forgot password", or sign in if your account is already confirmed.', 'err');
   if(recovering && data.session){ $('rc-cancel').hidden = true; return showView('recovery'); }
   if(data.session) await enter(); else showView('login');
 }
@@ -463,10 +463,10 @@ async function boot(){
 $('view-login').addEventListener('submit', async e => {
   e.preventDefault();
   const cap = takeCaptcha('login');
-  if(!cap.ok) return setMsg('login', 'Bevestig eerst de CAPTCHA.');
+  if(!cap.ok) return setMsg('login', 'Please complete the CAPTCHA first.');
   const {error} = await sb.auth.signInWithPassword({
     email: $('email').value.trim(), password: $('password').value, options:{captchaToken: cap.token}});
-  if(error) return setMsg('login', 'Aanmelden mislukt: ' + error.message);
+  if(error) return setMsg('login', 'Sign-in failed: ' + error.message);
   $('password').value = '';
   await enter();
 });
@@ -474,40 +474,40 @@ $('view-login').addEventListener('submit', async e => {
 $('view-signup').addEventListener('submit', async e => {
   e.preventDefault();
   const company = $('su-company').value.trim(), email = $('su-email').value.trim(), pw = $('su-pw').value;
-  if(!company) return setMsg('signup', 'Vul je bedrijfsnaam in.');
-  if(pw.length < 10) return setMsg('signup', 'Het wachtwoord moet minstens 10 tekens hebben.');
-  if(pw !== $('su-pw2').value) return setMsg('signup', 'De wachtwoorden komen niet overeen.');
-  if(!$('su-consent').checked) return setMsg('signup', 'Je moet akkoord gaan met de privacyverklaring.');
+  if(!company) return setMsg('signup', 'Enter your company name.');
+  if(pw.length < 10) return setMsg('signup', 'The password must be at least 10 characters.');
+  if(pw !== $('su-pw2').value) return setMsg('signup', 'The passwords do not match.');
+  if(!$('su-consent').checked) return setMsg('signup', 'You must agree to the privacy notice.');
   const cap = takeCaptcha('signup');
-  if(!cap.ok) return setMsg('signup', 'Bevestig eerst de CAPTCHA.');
+  if(!cap.ok) return setMsg('signup', 'Please complete the CAPTCHA first.');
   const {data, error} = await sb.auth.signUp({email, password: pw,
     options:{data:{company}, emailRedirectTo: pageUrl(), captchaToken: cap.token}});
-  if(error) return setMsg('signup', 'Registreren mislukt: ' + error.message);
+  if(error) return setMsg('signup', 'Registration failed: ' + error.message);
   $('su-pw').value = $('su-pw2').value = '';
   if(data.session) return enter();             // e-mail confirmation switched off in Supabase
-  setMsg('signup', 'Bijna klaar. We stuurden een e-mail naar ' + email + '. Klik op de link in dat bericht om je adres te bevestigen. Daarna beoordeelt de beheerder je aanvraag.', 'ok');
+  setMsg('signup', 'Almost done. We sent an email to ' + email + '. Click the link in that message to confirm your address. After that, the administrator will review your request.', 'ok');
 });
 
 $('view-forgot').addEventListener('submit', async e => {
   e.preventDefault();
   const cap = takeCaptcha('forgot');
-  if(!cap.ok) return setMsg('forgot', 'Bevestig eerst de CAPTCHA.');
+  if(!cap.ok) return setMsg('forgot', 'Please complete the CAPTCHA first.');
   const {error} = await sb.auth.resetPasswordForEmail($('fg-email').value.trim(),
     {redirectTo: pageUrl(), captchaToken: cap.token});
-  if(error) return setMsg('forgot', 'Versturen mislukt: ' + error.message);
-  setMsg('forgot', 'Als dit adres bij ons bekend is, ontvang je binnen enkele minuten een e-mail met een link.', 'ok');
+  if(error) return setMsg('forgot', 'Sending failed: ' + error.message);
+  setMsg('forgot', 'If this address is known to us, you will receive an email with a link within a few minutes.', 'ok');
 });
 
 $('view-recovery').addEventListener('submit', async e => {
   e.preventDefault();
   const pw = $('rc-pw').value;
-  if(pw.length < 10) return setMsg('recovery', 'Het wachtwoord moet minstens 10 tekens hebben.');
-  if(pw !== $('rc-pw2').value) return setMsg('recovery', 'De wachtwoorden komen niet overeen.');
+  if(pw.length < 10) return setMsg('recovery', 'The password must be at least 10 characters.');
+  if(pw !== $('rc-pw2').value) return setMsg('recovery', 'The passwords do not match.');
   const {error} = await sb.auth.updateUser({password: pw});
-  if(error) return setMsg('recovery', 'Opslaan mislukt: ' + error.message);
+  if(error) return setMsg('recovery', 'Saving failed: ' + error.message);
   $('rc-pw').value = $('rc-pw2').value = '';
   recovering = false;
-  toast('Wachtwoord gewijzigd');
+  toast('Password changed');
   await enter();
 });
 $('pwBtn').onclick = () => { $('rc-cancel').hidden = false; showView('recovery'); };
@@ -522,16 +522,16 @@ async function enter(){
   const {data:{user}} = await sb.auth.getUser();
   if(!user){ showView('login'); return; }
   const {data:prof, error} = await sb.from('profiles').select('*').eq('id', user.id).single();
-  if(error){ fail(error, 'Profiel laden mislukt'); return; }
+  if(error){ fail(error, 'Could not load profile'); return; }
   me = prof;
 
   if(me.status !== 'approved'){
     if(me.status === 'rejected'){
-      $('pendingTitle').textContent = 'Toegang geweigerd';
-      $('pendingText').textContent = 'Je aanvraag werd niet goedgekeurd. Neem contact op met ' + COMPANY_NAME + ' als dit een vergissing is.';
+      $('pendingTitle').textContent = 'Access denied';
+      $('pendingText').textContent = 'Your request was not approved. Contact ' + COMPANY_NAME + ' if you think this is a mistake.';
     } else {
-      $('pendingTitle').textContent = 'Aanvraag in behandeling';
-      $('pendingText').textContent = 'Bedankt' + (me.company ? ', ' + me.company : '') + '. Je e-mailadres is bevestigd en je aanvraag wacht op goedkeuring door de beheerder. Je kan later terugkomen en opnieuw controleren.';
+      $('pendingTitle').textContent = 'Request pending';
+      $('pendingText').textContent = 'Thank you' + (me.company ? ', ' + me.company : '') + '. Your email address is confirmed and your request is waiting for approval by the administrator. You can come back later and check again.';
     }
     showView('pending');
     return;
@@ -558,60 +558,60 @@ async function loadAdmin(){
     sb.from('profiles').select('*').order('created_at', {ascending:false}),
     sb.from('customer_access').select('*')]);
   const err = p.error || a.error;
-  if(err){ $('adminBody').textContent = 'Laden mislukt: ' + err.message; return; }
+  if(err){ $('adminBody').textContent = 'Loading failed: ' + err.message; return; }
   adm.profiles = p.data; adm.access = a.data;
   renderAdmin(); refreshBadge();
 }
-$('adminBtn').onclick = async () => { $('adminBody').textContent = 'Laden…'; $('adminDialog').showModal(); await loadAdmin(); };
+$('adminBtn').onclick = async () => { $('adminBody').textContent = 'Loading…'; $('adminDialog').showModal(); await loadAdmin(); };
 $('adminClose').onclick = () => $('adminDialog').close();
 
-const USER_STATUS = {pending:['In afwachting','orange'], approved:['Goedgekeurd','green'], rejected:['Geweigerd','red']};
+const USER_STATUS = {pending:['Pending','orange'], approved:['Approved','green'], rejected:['Rejected','red']};
 
 function renderAdmin(){
   const pend = adm.profiles.filter(p => p.status === 'pending').length;
   let html = `<div class="tabs">
-    <button class="secondary small ${adm.tab==='users'?'on':''}" data-tab="users">Gebruikers${pend ? ` <span class="badge">${pend}</span>` : ''}</button>
-    <button class="secondary small ${adm.tab==='customers'?'on':''}" data-tab="customers">Klanten</button></div>`;
+    <button class="secondary small ${adm.tab==='users'?'on':''}" data-tab="users">Users${pend ? ` <span class="badge">${pend}</span>` : ''}</button>
+    <button class="secondary small ${adm.tab==='customers'?'on':''}" data-tab="customers">Customers</button></div>`;
 
   if(adm.tab === 'users'){
     const order = {pending:0, rejected:1, approved:2};
     const users = [...adm.profiles].sort((a,b) => order[a.status]-order[b.status] || a.email.localeCompare(b.email));
-    html += `<div class="table-wrap"><table><thead><tr><th>E-mail</th><th>Bedrijf</th><th>Rol</th><th>Status</th><th>Klanten</th><th></th></tr></thead><tbody>` +
+    html += `<div class="table-wrap"><table><thead><tr><th>Email</th><th>Company</th><th>Role</th><th>Status</th><th>Customers</th><th></th></tr></thead><tbody>` +
       users.map(u => {
         const self = u.id === me.id;
         const links = adm.access.filter(x => x.user_id === u.id);
-        const chips = links.map(l => `<span class="chip2">${esc(custName(l.customer_id))}<a href="#" data-act="unlink" data-u="${esc(u.id)}" data-c="${esc(l.customer_id)}" title="Ontkoppel">✕</a></span>`).join('') || '<span class="sub">geen</span>';
+        const chips = links.map(l => `<span class="chip2">${esc(custName(l.customer_id))}<a href="#" data-act="unlink" data-u="${esc(u.id)}" data-c="${esc(l.customer_id)}" title="Unlink">✕</a></span>`).join('') || '<span class="sub">none</span>';
         const free = customers.filter(c => !links.some(l => l.customer_id === c.id));
-        const sel = free.length ? `<select data-linksel="${esc(u.id)}"><option value="">+ Koppel klant…</option>${free.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('')}</select>` : '';
+        const sel = free.length ? `<select data-linksel="${esc(u.id)}"><option value="">+ Link customer…</option>${free.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('')}</select>` : '';
         const [stLabel, stCss] = USER_STATUS[u.status] || [u.status, 'orange'];
         const btns = [];
-        if(u.status !== 'approved') btns.push(`<button class="small" data-act="approve" data-u="${esc(u.id)}">Goedkeuren</button>`);
-        if(!self && u.status === 'pending') btns.push(`<button class="small secondary" data-act="reject" data-u="${esc(u.id)}">Weigeren</button>`);
-        if(!self && u.status === 'approved') btns.push(`<button class="small secondary" data-act="reject" data-u="${esc(u.id)}">Blokkeren</button>`);
-        if(!self && u.status === 'approved') btns.push(`<button class="small secondary" data-act="role" data-u="${esc(u.id)}" data-role="${u.role === 'admin' ? 'engineer' : 'admin'}">${u.role === 'admin' ? 'Admin afnemen' : 'Maak admin'}</button>`);
-        if(!self) btns.push(`<button class="small danger" data-act="deluser" data-u="${esc(u.id)}">Verwijder</button>`);
+        if(u.status !== 'approved') btns.push(`<button class="small" data-act="approve" data-u="${esc(u.id)}">Approve</button>`);
+        if(!self && u.status === 'pending') btns.push(`<button class="small secondary" data-act="reject" data-u="${esc(u.id)}">Reject</button>`);
+        if(!self && u.status === 'approved') btns.push(`<button class="small secondary" data-act="reject" data-u="${esc(u.id)}">Block</button>`);
+        if(!self && u.status === 'approved') btns.push(`<button class="small secondary" data-act="role" data-u="${esc(u.id)}" data-role="${u.role === 'admin' ? 'engineer' : 'admin'}">${u.role === 'admin' ? 'Remove admin' : 'Make admin'}</button>`);
+        if(!self) btns.push(`<button class="small danger" data-act="deluser" data-u="${esc(u.id)}">Delete</button>`);
         return `<tr><td><strong>${esc(u.email)}</strong><span class="sub">${fmtDate((u.created_at||'').slice(0,10))}</span></td>
           <td>${esc(u.company) || '—'}</td><td>${u.role === 'admin' ? 'admin' : 'engineer'}</td>
           <td><span class="status ${stCss}">${stLabel}</span></td><td>${chips}<br>${sel}</td>
           <td class="actions" style="white-space:normal">${btns.join(' ')}</td></tr>`;
       }).join('') + `</tbody></table></div>`;
   } else {
-    html += `<div class="table-wrap"><table><thead><tr><th>Klant</th><th>Assets</th><th>Gebruikers</th><th></th></tr></thead><tbody>` +
+    html += `<div class="table-wrap"><table><thead><tr><th>Customer</th><th>Assets</th><th>Users</th><th></th></tr></thead><tbody>` +
       customers.map(c => {
         const n = assets.filter(a => a.customer_id === c.id).length;
         const users = adm.access.filter(x => x.customer_id === c.id).map(x => (adm.profiles.find(p => p.id === x.user_id) || {}).email).filter(Boolean);
-        return `<tr><td><strong>${esc(c.name)}</strong></td><td>${n}</td><td>${users.map(esc).join('<br>') || '<span class="sub">geen</span>'}</td>
-          <td class="actions"><button class="small secondary" data-act="rename" data-c="${esc(c.id)}">Hernoem</button>
-          <button class="small danger" data-act="delcust" data-c="${esc(c.id)}">Verwijder…</button></td></tr>`;
+        return `<tr><td><strong>${esc(c.name)}</strong></td><td>${n}</td><td>${users.map(esc).join('<br>') || '<span class="sub">none</span>'}</td>
+          <td class="actions"><button class="small secondary" data-act="rename" data-c="${esc(c.id)}">Rename</button>
+          <button class="small danger" data-act="delcust" data-c="${esc(c.id)}">Delete…</button></td></tr>`;
       }).join('') + `</tbody></table></div>
-      <p class="sub">Een klant verwijderen wist ook alle assets en de historiek van die klant. Gebruikt voor verzoeken tot gegevenswissing.</p>`;
+      <p class="sub">Deleting a customer also erases all assets and the history of that customer. Use this for data erasure requests.</p>`;
   }
   $('adminBody').innerHTML = html;
 }
 
 async function adminCall(fn, args, okMsg){
   const {error} = await sb.rpc(fn, args);
-  if(error){ fail(error, 'Actie mislukt'); return false; }
+  if(error){ fail(error, 'Action failed'); return false; }
   if(okMsg) toast(okMsg);
   return true;
 }
@@ -619,8 +619,8 @@ $('adminBody').addEventListener('change', async e => {
   const sel = e.target.closest('[data-linksel]');
   if(!sel || !sel.value) return;
   const {error} = await sb.from('customer_access').insert({user_id: sel.dataset.linksel, customer_id: sel.value});
-  if(error) return fail(error, 'Koppelen mislukt');
-  toast('Klant gekoppeld'); loadAdmin();
+  if(error) return fail(error, 'Linking failed');
+  toast('Customer linked'); loadAdmin();
 });
 $('adminBody').addEventListener('click', async e => {
   const tab = e.target.closest('[data-tab]');
@@ -632,8 +632,8 @@ $('adminBody').addEventListener('click', async e => {
 
   if(act === 'unlink'){
     const {error} = await sb.from('customer_access').delete().eq('user_id', u).eq('customer_id', c);
-    if(error) return fail(error, 'Ontkoppelen mislukt');
-    toast('Klant ontkoppeld'); loadAdmin();
+    if(error) return fail(error, 'Unlinking failed');
+    toast('Customer unlinked'); loadAdmin();
   }
   else if(act === 'approve'){
     approveFor = u;
@@ -644,30 +644,30 @@ $('adminBody').addEventListener('click', async e => {
     $('approveDialog').showModal();
   }
   else if(act === 'reject'){
-    if(await adminCall('admin_set_status', {p_user:u, p_status:'rejected'}, 'Status bijgewerkt')) loadAdmin();
+    if(await adminCall('admin_set_status', {p_user:u, p_status:'rejected'}, 'Status updated')) loadAdmin();
   }
   else if(act === 'role'){
-    if(await adminCall('admin_set_role', {p_user:u, p_role:t.dataset.role}, 'Rol bijgewerkt')) loadAdmin();
+    if(await adminCall('admin_set_role', {p_user:u, p_role:t.dataset.role}, 'Role updated')) loadAdmin();
   }
   else if(act === 'deluser'){
-    if(!confirm(`${prof.email} definitief verwijderen? De login verdwijnt. De assets van de klant blijven bestaan.`)) return;
-    if(await adminCall('admin_delete_user', {p_user:u}, 'Gebruiker verwijderd')) loadAdmin();
+    if(!confirm(`Permanently delete ${prof.email}? The login will be removed. The customer's assets are kept.`)) return;
+    if(await adminCall('admin_delete_user', {p_user:u}, 'User deleted')) loadAdmin();
   }
   else if(act === 'rename'){
     const cur = customers.find(x => x.id === c);
-    const name = (prompt('Nieuwe naam voor deze klant:', cur.name) || '').trim();
+    const name = (prompt('New name for this customer:', cur.name) || '').trim();
     if(!name || name === cur.name) return;
     const {error} = await sb.from('customers').update({name}).eq('id', c);
-    if(error) return fail(error, 'Hernoemen mislukt');
-    toast('Klant hernoemd'); await loadAll(); loadAdmin();
+    if(error) return fail(error, 'Renaming failed');
+    toast('Customer renamed'); await loadAll(); loadAdmin();
   }
   else if(act === 'delcust'){
     const cur = customers.find(x => x.id === c);
     const n = assets.filter(a => a.customer_id === c).length;
-    const typed = prompt(`Dit verwijdert "${cur.name}" met ${n} asset(s) en de volledige historiek. Dit kan niet ongedaan gemaakt worden.\n\nTyp de naam van de klant om te bevestigen:`);
+    const typed = prompt(`This deletes "${cur.name}" with ${n} asset(s) and the full history. This cannot be undone.\n\nType the customer's name to confirm:`);
     if(typed === null) return;
-    if(typed.trim() !== cur.name) return toast('Naam komt niet overeen, niets verwijderd');
-    if(await adminCall('admin_delete_customer', {p_customer:c}, 'Klant verwijderd')){
+    if(typed.trim() !== cur.name) return toast('Name does not match, nothing deleted');
+    if(await adminCall('admin_delete_customer', {p_customer:c}, 'Customer deleted')){
       if(state.customer === c) state.customer = '';
       await loadAll(); loadAdmin();
     }
@@ -682,9 +682,9 @@ $('approveForm').addEventListener('submit', async e => {
   if(mode === 'existing') args.p_customer = $('approveCust').value;
   else {
     args.p_new_name = $('approveName').value.trim();
-    if(!args.p_new_name) return toast('Geef een klantnaam in');
+    if(!args.p_new_name) return toast('Enter a customer name');
   }
-  if(await adminCall('admin_approve_user', args, 'Gebruiker goedgekeurd')){
+  if(await adminCall('admin_approve_user', args, 'User approved')){
     $('approveDialog').close(); await loadAll(); loadAdmin();
   }
 });
@@ -694,39 +694,39 @@ function renderLegal(){
   const unset = COMPANY_NAME.includes('JOUW') || PRIVACY_CONTACT.includes('jouwbedrijf');
   const co = esc(COMPANY_NAME), mail = esc(PRIVACY_CONTACT);
   $('legalBody').innerHTML = `
-    ${unset ? '<p class="msg err">Beheerder: vul <code>COMPANY_NAME</code> en <code>PRIVACY_CONTACT</code> in bovenaan het script voor je dit publiceert.</p>' : ''}
-    <h3>1. Wie is verantwoordelijk?</h3>
-    <p>${co} (hierna "wij") beheert deze Infrastructure Lifecycle Tracker en is verantwoordelijk voor de verwerking van je persoonsgegevens. Contact: <a href="mailto:${mail}">${mail}</a>.</p>
-    <h3>2. Welke gegevens verwerken we?</h3>
+    ${unset ? '<p class="msg err">Administrator: fill in <code>COMPANY_NAME</code> and <code>PRIVACY_CONTACT</code> at the top of the script before publishing this.</p>' : ''}
+    <h3>1. Who is responsible?</h3>
+    <p>${co} ("we") runs this Infrastructure Lifecycle Tracker and is responsible for processing your personal data. Contact: <a href="mailto:${mail}">${mail}</a>.</p>
+    <h3>2. What data do we process?</h3>
     <ul>
-      <li><strong>Account:</strong> e-mailadres, bedrijfsnaam en je (versleutelde) wachtwoord.</li>
-      <li><strong>Assetgegevens die je zelf invoert:</strong> hostname, fabrikant, model, serienummer, locatie, contactpersoon, garantie- en contractgegevens en notities.</li>
-      <li><strong>Wijzigingshistoriek:</strong> wie welke asset wanneer heeft toegevoegd, gewijzigd of verwijderd (e-mailadres en tijdstip).</li>
+      <li><strong>Account:</strong> email address, company name and your (hashed) password.</li>
+      <li><strong>Asset data you enter yourself:</strong> hostname, vendor, model, serial number, location, contact person, warranty and contract details, and notes.</li>
+      <li><strong>Change history:</strong> who added, changed or deleted which asset and when (email address and time).</li>
     </ul>
-    <p>Voer geen wachtwoorden, toegangssleutels of andere gevoelige gegevens in, ook niet in het notitieveld.</p>
-    <h3>3. Waarvoor gebruiken we ze?</h3>
-    <p>Om je toegang te geven tot de tracker, je assets en hun garantie- en contractstatus bij te houden, je aanvraag te beoordelen, het systeem te beveiligen en wijzigingen te kunnen nagaan. Rechtsgrond: uitvoering van de overeenkomst met jou of je organisatie en ons gerechtvaardigd belang om de dienst veilig en betrouwbaar te houden.</p>
-    <h3>4. Wie ziet je gegevens?</h3>
-    <p>Gebruikers van jouw organisatie zien alleen de gegevens van hun eigen organisatie. Beheerders van ${co} kunnen alle gegevens zien. We verkopen je gegevens niet en gebruiken ze niet voor reclame.</p>
-    <h3>5. Verwerkers en bewaring</h3>
+    <p>Do not enter passwords, access keys or other sensitive data, not even in the notes field.</p>
+    <h3>3. What do we use it for?</h3>
+    <p>To give you access to the tracker, to keep track of your assets and their warranty and contract status, to review your request, to secure the system and to be able to trace changes. Legal basis: performance of the agreement with you or your organisation, and our legitimate interest in keeping the service secure and reliable.</p>
+    <h3>4. Who can see your data?</h3>
+    <p>Users of your organisation only see the data of their own organisation. Administrators of ${co} can see all data. We do not sell your data and do not use it for advertising.</p>
+    <h3>5. Processors and retention</h3>
     <ul>
-      <li>Supabase (database en aanmelding), regio Europese Unie (Frankfurt).</li>
-      <li>GitHub Pages (hosting van deze webpagina). Hierop staan geen klantgegevens.</li>
-      <li>Een e-mailprovider voor bevestigings- en herstelmails.</li>
-      ${TURNSTILE_SITEKEY ? '<li>Cloudflare Turnstile (CAPTCHA tegen misbruik).</li>' : ''}
+      <li>Supabase (database and sign-in), European Union region (Frankfurt).</li>
+      <li>GitHub Pages (hosting of this web page). No customer data is stored there.</li>
+      <li>An email provider for confirmation and password reset emails.</li>
+      ${TURNSTILE_SITEKEY ? '<li>Cloudflare Turnstile (CAPTCHA against abuse).</li>' : ''}
     </ul>
-    <p>We bewaren je gegevens zolang je account of de overeenkomst loopt. Op verzoek wissen we je account en de gegevens van je organisatie.</p>
-    <h3>6. Je rechten</h3>
-    <p>Je kan inzage, verbetering, wissing, beperking, overdraagbaarheid en bezwaar vragen via <a href="mailto:${mail}">${mail}</a>. Je kan ook klacht indienen bij de toezichthoudende autoriteit, in België de Gegevensbeschermingsautoriteit (gegevensbeschermingsautoriteit.be). Je kan je assets zelf exporteren als CSV.</p>
-    <h3>7. Cookies en lokale opslag</h3>
-    <p>We gebruiken enkel technisch noodzakelijke opslag in je browser om je aangemeld te houden en je instellingen te onthouden. Geen tracking of reclamecookies.</p>
-    <h3>8. Voorwaarden van gebruik</h3>
+    <p>We keep your data as long as your account or the agreement runs. On request we erase your account and the data of your organisation.</p>
+    <h3>6. Your rights</h3>
+    <p>You can request access, rectification, erasure, restriction, portability and object to processing via <a href="mailto:${mail}">${mail}</a>. You can also lodge a complaint with your supervisory authority, in Belgium the Data Protection Authority (gegevensbeschermingsautoriteit.be). You can export your assets yourself as CSV.</p>
+    <h3>7. Cookies and local storage</h3>
+    <p>We only use technically necessary storage in your browser to keep you signed in and to remember your settings. No tracking or advertising cookies.</p>
+    <h3>8. Terms of use</h3>
     <ul>
-      <li>Je mag enkel gegevens invoeren waarvoor je zelf bevoegd bent.</li>
-      <li>Je houdt je inloggegevens geheim en deelt je account niet.</li>
-      <li>Wij kunnen een account weigeren, blokkeren of verwijderen bij misbruik.</li>
-      <li>De dienst wordt aangeboden zonder garantie op beschikbaarheid of juistheid van de getoonde status. Controleer belangrijke vervaldata altijd bij je leverancier. Maak zelf regelmatig een CSV-export als back-up.</li>
-      <li>Per klant kunnen maximaal 1000 assets worden opgeslagen.</li>
+      <li>Only enter data you are authorised to enter.</li>
+      <li>Keep your login details secret and do not share your account.</li>
+      <li>We may refuse, block or delete an account in case of misuse.</li>
+      <li>The service is provided without any guarantee of availability or accuracy of the status shown. Always check important expiry dates with your supplier. Make regular CSV exports as a backup.</li>
+      <li>A maximum of 1000 assets can be stored per customer.</li>
     </ul>`;
 }
 document.querySelectorAll('[data-legal]').forEach(a => a.addEventListener('click', e => {
@@ -748,7 +748,7 @@ async function fetchAll(table, order){
 async function loadAll(){
   try {
     [customers, assets] = await Promise.all([fetchAll('customers','name'), fetchAll('assets','warranty')]);
-  } catch(e){ fail(e, 'Laden mislukt'); }
+  } catch(e){ fail(e, 'Loading failed'); }
   render();
 }
 const custName = id => (customers.find(c => c.id === id) || {}).name || '—';
@@ -772,7 +772,7 @@ function render(){
   $('supported').textContent = scope.filter(a => a.status==='supported').length;
   $('expiring').textContent = scope.filter(a => a.status==='expiring').length;
   $('expired').textContent = scope.filter(a => a.status==='expired').length;
-  $('expiringLabel').textContent = `Vervalt binnen ${settings.threshold} dagen`;
+  $('expiringLabel').textContent = `Expires within ${settings.threshold} days`;
   // breakdown: how many assets fall in each bucket by warranty alone / by contract alone
   const bucket = (date, st) => date && getStatus(daysLeft(date)) === st;
   [['supported','supported'],['expiring','expiring'],['expired','expired']].forEach(([id, st]) => {
@@ -784,7 +784,7 @@ function render(){
 
   // per-customer chips
   $('chips').innerHTML =
-    `<button class="chip ${state.customer===''?'active':''}" data-cust="">Alle klanten · ${customers.length} klant${customers.length===1?'':'en'} · ${all.length} asset${all.length===1?'':'s'}</button>` +
+    `<button class="chip ${state.customer===''?'active':''}" data-cust="">All customers · ${customers.length} customer${customers.length===1?'':'s'} · ${all.length} asset${all.length===1?'':'s'}</button>` +
     customers.map(c => {
       const mine = all.filter(a => a.customer_id === c.id);
       const exp = mine.filter(a => a.status==='expiring').length, ex = mine.filter(a => a.status==='expired').length;
@@ -795,7 +795,7 @@ function render(){
   // vendor dropdown
   const vf = $('vendorFilter'), cur = vf.value;
   const vendors = [...new Set(all.map(a => a.vendor).filter(Boolean))].sort();
-  vf.innerHTML = '<option value="">Alle vendors</option>' + vendors.map(v => `<option>${esc(v)}</option>`).join('');
+  vf.innerHTML = '<option value="">All vendors</option>' + vendors.map(v => `<option>${esc(v)}</option>`).join('');
   vf.value = vendors.includes(cur) ? cur : '';
 
   const q = $('search').value.trim().toLowerCase();
@@ -809,7 +809,7 @@ function render(){
     let x = a[k], y = b[k];
     if(k === 'days'){ x = a.days ?? 1e9; y = b.days ?? 1e9; }
     if(k === 'contract_end'){ x = a.contract_end || '9999-12-31'; y = b.contract_end || '9999-12-31'; }
-    if(typeof x === 'string') return x.localeCompare(y, 'nl', {numeric:true}) * dir;
+    if(typeof x === 'string') return x.localeCompare(y, 'en', {numeric:true}) * dir;
     return (x - y) * dir;
   });
   document.querySelectorAll('th.sortable').forEach(th => {
@@ -829,16 +829,16 @@ function render(){
       <td class="num ${ui.css}">${remaining(a.days)}<span class="sub">via ${a.via === 'contract' ? 'contract' : 'warranty'}</span></td>
       <td><span class="status ${ui.css}">${ui.label}</span></td>
       <td class="actions">
-        <button class="small secondary" data-hist="${esc(a.id)}" title="Historiek">⟲</button>
-        <button class="small secondary" data-edit="${esc(a.id)}">Bewerk</button>
+        <button class="small secondary" data-hist="${esc(a.id)}" title="History">⟲</button>
+        <button class="small secondary" data-edit="${esc(a.id)}">Edit</button>
         <button class="small danger" data-del="${esc(a.id)}">✕</button>
       </td></tr>`;
   }).join('');
 
   $('empty').hidden = rows.length > 0;
   $('empty').textContent = !customers.length
-    ? (me && me.role === 'admin' ? 'Nog geen klanten. Klik op "+ Klant" om te starten.' : 'Je hebt nog geen toegang tot een klant. Vraag een admin om toegang.')
-    : (assets.length ? 'Geen assets gevonden voor deze filter.' : 'Nog geen assets. Klik op "+ Asset toevoegen".');
+    ? (me && me.role === 'admin' ? 'No customers yet. Click "+ Customer" to get started.' : 'You do not have access to a customer yet. Ask an admin for access.')
+    : (assets.length ? 'No assets found for this filter.' : 'No assets yet. Click "+ Add asset".');
 }
 
 /* ---------- filters / sort ---------- */
@@ -863,12 +863,12 @@ document.querySelectorAll('th.sortable').forEach(th => th.addEventListener('clic
 
 /* ---------- customers ---------- */
 $('custBtn').onclick = async () => {
-  const name = (prompt('Naam van de nieuwe klant:') || '').trim();
+  const name = (prompt('Name of the new customer:') || '').trim();
   if(!name) return;
   const {data, error} = await sb.from('customers').insert({name}).select().single();
-  if(error) return fail(error, 'Klant toevoegen mislukt');
-  customers.push(data); customers.sort((a,b) => a.name.localeCompare(b.name, 'nl'));
-  toast('Klant toegevoegd'); render();
+  if(error) return fail(error, 'Adding customer failed');
+  customers.push(data); customers.sort((a,b) => a.name.localeCompare(b.name, 'en'));
+  toast('Customer added'); render();
 };
 
 /* ---------- asset dialog ---------- */
@@ -876,10 +876,10 @@ const dlg = $('dialog');
 const F = ['hostname','vendor','model','serial','location','owner','warranty','contract_end','contract_type','contract_number','notes'];
 
 function openDialog(id){
-  if(!customers.length){ toast('Er is nog geen klant beschikbaar'); return; }
+  if(!customers.length){ toast('No customer available yet'); return; }
   state.editId = id || null;
   const a = id ? assets.find(x => x.id === id) : null;
-  $('dialogTitle').textContent = a ? 'Asset bewerken' : 'Asset toevoegen';
+  $('dialogTitle').textContent = a ? 'Edit asset' : 'Add asset';
   $('customer').innerHTML = customers.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
   $('customer').value = a ? a.customer_id : (state.customer || customers[0].id);
   F.forEach(f => $(f).value = a ? (a[f] ?? '') : (f === 'vendor' ? 'Dell' : ''));
@@ -907,14 +907,14 @@ $('assetForm').addEventListener('submit', async e => {
       const {data, error} = await sb.from('assets').update(rec).eq('id', state.editId).select().single();
       if(error) throw error;
       assets[assets.findIndex(a => a.id === state.editId)] = data;
-      toast('Asset bijgewerkt');
+      toast('Asset updated');
     } else {
       const {data, error} = await sb.from('assets').insert(rec).select().single();
       if(error) throw error;
-      assets.push(data); toast('Asset toegevoegd');
+      assets.push(data); toast('Asset added');
     }
     dlg.close(); render();
-  } catch(err){ fail(err, 'Opslaan mislukt'); }
+  } catch(err){ fail(err, 'Saving failed'); }
   $('saveBtn').disabled = false;
 });
 
@@ -924,10 +924,10 @@ $('assetTable').addEventListener('click', async e => {
   if(hist) showHistory(hist.dataset.hist);
   if(del){
     const a = assets.find(x => x.id === del.dataset.del);
-    if(a && confirm(`"${a.hostname}" verwijderen?`)){
+    if(a && confirm(`Delete "${a.hostname}"?`)){
       const {error} = await sb.from('assets').delete().eq('id', a.id);
-      if(error) return fail(error, 'Verwijderen mislukt');
-      assets = assets.filter(x => x.id !== a.id); render(); toast('Asset verwijderd');
+      if(error) return fail(error, 'Deleting failed');
+      assets = assets.filter(x => x.id !== a.id); render(); toast('Asset deleted');
     }
   }
 });
@@ -935,22 +935,22 @@ $('assetTable').addEventListener('click', async e => {
 /* ---------- history ---------- */
 async function showHistory(id){
   const a = assets.find(x => x.id === id);
-  $('histTitle').textContent = `Historiek – ${a ? a.hostname : ''}`;
-  $('histLog').innerHTML = 'Laden…';
+  $('histTitle').textContent = `History – ${a ? a.hostname : ''}`;
+  $('histLog').innerHTML = 'Loading…';
   $('histDialog').showModal();
   const {data, error} = await sb.from('audit_log').select('*').eq('asset_id', id).order('at', {ascending:false}).limit(50);
-  if(error){ $('histLog').textContent = 'Kon historiek niet laden.'; return; }
-  const labels = {customer_id:'klant',hostname:'hostname',vendor:'vendor',model:'model',serial:'serial',location:'locatie',owner:'eigenaar',warranty:'warranty',contract_end:'contract tot',contract_type:'type contract',contract_number:'contractnr',notes:'notities'};
+  if(error){ $('histLog').textContent = 'Could not load history.'; return; }
+  const labels = {customer_id:'customer',hostname:'hostname',vendor:'vendor',model:'model',serial:'serial',location:'location',owner:'owner',warranty:'warranty',contract_end:'contract until',contract_type:'contract type',contract_number:'contract no.',notes:'notes'};
   $('histLog').innerHTML = data.map(r => {
-    let what = r.action === 'insert' ? 'aangemaakt' : r.action === 'delete' ? 'verwijderd' : '';
+    let what = r.action === 'insert' ? 'created' : r.action === 'delete' ? 'deleted' : '';
     if(r.action === 'update'){
       what = Object.keys(labels).filter(k => (r.old_data||{})[k] !== (r.new_data||{})[k]).map(k => {
         const f = v => k === 'customer_id' ? custName(v) : (v === '' || v == null ? '∅' : String(v));
         return `${labels[k]}: ${esc(f(r.old_data[k]))} → ${esc(f(r.new_data[k]))}`;
-      }).join('<br>') || 'geen wijziging';
+      }).join('<br>') || 'no change';
     }
-    return `<div><strong>${new Date(r.at).toLocaleString('nl-BE')}</strong> – ${esc(r.user_email || 'onbekend')}<br>${what}</div>`;
-  }).join('') || 'Geen historiek.';
+    return `<div><strong>${new Date(r.at).toLocaleString('en-GB')}</strong> – ${esc(r.user_email || 'unknown')}<br>${what}</div>`;
+  }).join('') || 'No history.';
 }
 $('histClose').onclick = () => $('histDialog').close();
 
@@ -995,11 +995,11 @@ $('importFile').addEventListener('change', async e => {
   const file = e.target.files[0]; e.target.value = '';
   if(!file) return;
   const rows = parseCSV(await file.text());
-  if(rows.length < 2) return toast('Geen rijen gevonden in CSV');
+  if(rows.length < 2) return toast('No rows found in CSV');
   const head = rows[0].map(h => h.trim().toLowerCase());
-  if(!head.includes('hostname')) return toast('CSV mist een "hostname"-kolom');
+  if(!head.includes('hostname')) return toast('CSV is missing a "hostname" column');
   const hasCust = head.includes('customer') || head.includes('klant');
-  if(!hasCust && !state.customer) return toast('Geen klant-kolom in CSV: kies eerst een klant (bovenaan) om naar te importeren');
+  if(!hasCust && !state.customer) return toast('No customer column in CSV: first select a customer (at the top) to import into');
 
   let added = 0, updated = 0, skipped = 0, newCust = 0;
   const inserts = [];
@@ -1038,10 +1038,10 @@ $('importFile').addEventListener('change', async e => {
       if(error) throw error;
       assets.push(...data); added += data.length;
     }
-  } catch(err){ fail(err, 'Import onderbroken'); }
-  customers.sort((a,b) => a.name.localeCompare(b.name, 'nl'));
+  } catch(err){ fail(err, 'Import interrupted'); }
+  customers.sort((a,b) => a.name.localeCompare(b.name, 'en'));
   render();
-  toast(`Import: ${added} nieuw, ${updated} bijgewerkt, ${skipped} overgeslagen` + (newCust ? `, ${newCust} nieuwe klant(en)` : ''));
+  toast(`Import: ${added} new, ${updated} updated, ${skipped} skipped` + (newCust ? `, ${newCust} new customer(s)` : ''));
 });
 
 boot();
