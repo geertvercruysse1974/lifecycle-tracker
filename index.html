@@ -123,6 +123,7 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
   <div class="who" id="who" hidden>
     <span id="whoText"></span>
     <button class="small" id="adminBtn" hidden>Admin<span class="badge" id="pendingBadge" hidden></span></button>
+    <button class="secondary small" id="subBtn" hidden>Subscription</button>
     <button class="secondary small" id="pwBtn">Password</button>
     <button class="secondary small" id="logoutBtn">Sign out</button>
   </div>
@@ -319,6 +320,15 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
       <button type="submit">Approve</button>
     </div>
   </form>
+</dialog>
+
+<!-- ============ SUBSCRIPTION DIALOG (customers) ============ -->
+<dialog id="subDialog">
+  <div class="body">
+    <h2>Your subscription</h2>
+    <div id="subBody">Loading…</div>
+    <div class="dialog-actions" style="margin-top:14px"><button class="secondary" id="subClose">Close</button></div>
+  </div>
 </dialog>
 
 <!-- ============ BILLING DIALOG ============ -->
@@ -576,6 +586,7 @@ async function enter(){
   $('authBox').hidden = true; $('who').hidden = false; $('app').hidden = false;
   $('custBtn').hidden = me.role !== 'admin';
   $('adminBtn').hidden = me.role !== 'admin';
+  $('subBtn').hidden = me.role === 'admin';
   await loadAll();
   if(me.role === 'admin') refreshBadge();
 }
@@ -981,6 +992,7 @@ async function loadAll(){
   try {
     [customers, assets] = await Promise.all([fetchAll('customers','name'), fetchAll('assets','warranty')]);
   } catch(e){ fail(e, 'Loading failed'); }
+  await loadPlans();
   render();
 }
 const custName = id => (customers.find(c => c.id === id) || {}).name || '—';
@@ -1088,25 +1100,67 @@ function billingInfo(c){
   const d = daysLeft(c.access_until);
   return {state: d >= 0 ? 'active' : (d >= -GRACE_DAYS ? 'grace' : 'expired'), days: d};
 }
+let planInfo = {};   // per customer: {assets,label,max_assets,monthly_price,yearly_price,next_label}
+async function loadPlans(){
+  planInfo = {};
+  if(!me || me.role === 'admin') return;
+  await Promise.all(customers.map(async c => {
+    const {data, error} = await sb.rpc('customer_plan', {p_customer: c.id});
+    if(!error && data) planInfo[c.id] = data;
+  }));
+}
+const money = v => CURRENCY + Number(v).toFixed(2);
+
+// one line per customer: plan + end date, coloured by urgency
 function renderBanner(){
   const el = $('billingBanner');
   if(!me || me.role === 'admin'){ el.innerHTML = ''; return; }
   const out = [];
   customers.forEach(c => {
-    const b = billingInfo(c); if(b.state === 'open') return;
-    const name = esc(c.name), until = fmtDate(c.access_until);
-    const link = `<a href="mailto:${esc(BILLING_CONTACT)}?subject=${encodeURIComponent('Subscription ' + c.name)}">Contact us</a>`;
-    if(b.state === 'active'){
-      const left = `${b.days} day${b.days === 1 ? '' : 's'} left`;
-      if(c.billing_status === 'trial') out.push(['info', `Free trial for <b>${name}</b> ends on ${until} (${left}). ${link} to continue after the trial.`]);
-      else if(b.days <= 30) out.push(['warn', `The subscription for <b>${name}</b> ends on ${until} (${left}). ${link} to renew.`]);
+    if(c.billing_status === undefined) return;               // billing migration not run yet
+    const b = billingInfo(c), name = esc(c.name), until = fmtDate(c.access_until);
+    const pi = planInfo[c.id];
+    const link = txt => `<a href="mailto:${esc(BILLING_CONTACT)}?subject=${encodeURIComponent('Subscription ' + c.name)}">${txt}</a>`;
+    const parts = [`<b>${name}</b>`];
+    if(pi && pi.label) parts.push(esc(pi.label));
+    parts.push(c.billing_status === 'trial' ? 'Free trial' : `Subscription (${c.billing_period === 'yearly' ? 'yearly' : 'monthly'})`);
+    let kind = 'info';
+    if(b.state === 'open') parts.push('no end date');
+    else if(b.state === 'active'){
+      parts.push(`access until ${until} (${b.days} day${b.days === 1 ? '' : 's'} left)`);
+      if(c.billing_status === 'trial') parts.push(link('Contact us to continue after the trial'));
+      else if(b.days <= 30){ kind = 'warn'; parts.push(link('Contact us to renew')); }
     } else if(b.state === 'grace'){
       const g = parseDate(c.access_until); g.setDate(g.getDate() + GRACE_DAYS);
-      out.push(['bad', `Access for <b>${name}</b> ended on ${until}. You can still use the tracker until ${fmtDate(toIso(g))}. ${link} to renew.`]);
-    } else out.push(['bad', `Access for <b>${name}</b> has expired. Your data is kept. ${link} to reactivate.`]);
+      kind = 'bad'; parts.push(`ended on ${until}, you can still use the tracker until ${fmtDate(toIso(g))}`, link('Contact us to renew'));
+    } else { kind = 'bad'; parts.push(`access expired on ${until}. Your data is kept`, link('Contact us to reactivate')); }
+    out.push([kind, parts.join(' &middot; ')]);
   });
   el.innerHTML = out.map(([k, t]) => `<div class="bn bn-${k}">${t}</div>`).join('');
 }
+
+// details window for customers
+$('subBtn').onclick = async () => {
+  $('subBody').textContent = 'Loading…'; $('subDialog').showModal();
+  await loadPlans(); renderBanner();
+  $('subBody').innerHTML = customers.filter(c => c.billing_status !== undefined).map(c => {
+    const b = billingInfo(c), pi = planInfo[c.id] || {};
+    const row = (k, v) => `<tr><td style="color:var(--muted);white-space:nowrap;padding:5px 14px 5px 0">${k}</td><td style="padding:5px 0">${v}</td></tr>`;
+    const stateTxt = b.state === 'open' ? 'No end date' : b.state === 'active' ? 'Active' : b.state === 'grace' ? 'Ended - grace period' : 'Expired';
+    const prices = (pi.monthly_price != null || pi.yearly_price != null)
+      ? [pi.monthly_price != null ? `${money(pi.monthly_price)} / month` : '', pi.yearly_price != null ? `${money(pi.yearly_price)} / year` : ''].filter(Boolean).join(' or ') + ' <span class="sub" style="display:inline">(excl. VAT)</span>'
+      : 'as agreed in your quote';
+    return `<h3 style="margin:14px 0 6px">${esc(c.name)}</h3><table>` +
+      row('Plan', pi.label ? esc(pi.label) : '-') +
+      row('Assets stored', pi.assets !== undefined ? `${pi.assets}${pi.max_assets ? ' of ' + pi.max_assets : ''}` : '-') +
+      row('Status', (c.billing_status === 'trial' ? 'Free trial' : 'Subscription') + ' &middot; ' + stateTxt) +
+      row('Billing', c.billing_status === 'trial' ? 'No charge during the trial' : (c.billing_period === 'yearly' ? 'Yearly' : 'Monthly')) +
+      row('Price of your plan', prices) +
+      row('Access until', c.access_until ? `${fmtDate(c.access_until)}${b.days !== null ? ` (${b.days >= 0 ? b.days + ' days left' : -b.days + ' days ago'})` : ''}` : 'No end date') +
+      (pi.max_assets && pi.next_label ? `</table><p class="sub">If you store more than ${pi.max_assets} assets you move to the next plan (${esc(pi.next_label)}).</p>` : '</table>') ;
+  }).join('') + `<p style="margin-top:16px"><a href="mailto:${esc(BILLING_CONTACT)}?subject=Subscription">Contact us</a> to renew, switch between monthly and yearly, or change plan.</p>`;
+};
+$('subClose').onclick = () => $('subDialog').close();
 
 /* ---------- filters / sort ---------- */
 document.querySelectorAll('.card').forEach(c => c.addEventListener('click', () => { state.filter = c.dataset.filter; render(); }));
