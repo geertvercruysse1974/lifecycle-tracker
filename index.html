@@ -80,6 +80,9 @@ td.num{white-space:nowrap} td.actions{white-space:nowrap;text-align:right}
 a{color:var(--primary)}
 .badge{background:var(--red);color:#fff;border-radius:10px;padding:1px 7px;font-size:12px;margin-left:4px}
 footer{text-align:center;font-size:13px;color:var(--muted);padding:20px}
+.bn{padding:10px 14px;border-radius:8px;margin-bottom:10px;font-size:14px;border:1px solid}
+.bn-info{border-color:var(--primary)} .bn-warn{border-color:var(--orange)} .bn-bad{border-color:var(--red);color:var(--red)}
+.bn a{color:inherit;font-weight:bold}
 /* admin */
 #adminDialog{width:min(1050px,96vw)}
 #adminBody select{width:auto;margin:4px 0;padding:6px}
@@ -194,6 +197,8 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
 <footer id="footer"><a href="#" data-legal>Privacy &amp; terms</a></footer>
 
 <div class="container" id="app" hidden>
+
+  <div id="billingBanner"></div>
 
   <div class="cards">
     <button class="card active" data-filter="all"><h2 id="totalAssets">0</h2><p>Assets</p>
@@ -316,6 +321,30 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
   </form>
 </dialog>
 
+<!-- ============ BILLING DIALOG ============ -->
+<dialog id="billDialog">
+  <form id="billForm" method="dialog">
+    <h2 id="billTitle">Billing</h2>
+    <div class="grid">
+      <div><label for="bill-status">Status</label>
+        <select id="bill-status"><option value="trial">Free trial</option><option value="paid">Paid</option></select></div>
+      <div><label for="bill-period">Billing period</label>
+        <select id="bill-period"><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select></div>
+      <div class="full"><label for="bill-until">Access until</label>
+        <input type="date" id="bill-until">
+        <p class="sub" style="margin:-8px 0 12px">Leave empty for no limit. Users keep working for a grace period after this date.</p></div>
+      <div class="full"><label for="bill-ref">Invoice reference</label>
+        <input type="text" id="bill-ref" placeholder="e.g. INV-2027-014"></div>
+    </div>
+    <p class="sub" id="billInfo"></p>
+    <div class="dialog-actions">
+      <button type="button" class="secondary" id="billExtend">Paid: extend by period</button>
+      <button type="button" class="secondary" id="billCancel">Cancel</button>
+      <button type="submit">Save</button>
+    </div>
+  </form>
+</dialog>
+
 <!-- ============ PRIVACY DIALOG ============ -->
 <dialog id="legalDialog">
   <div class="body">
@@ -339,6 +368,9 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const COMPANY_NAME    = 'Asset_comp';      // legal name of the company running this tracker
 const PRIVACY_CONTACT = 'geert_vercruysse@outlook.com'; // where customers send privacy / deletion requests
 const TURNSTILE_SITEKEY = '';                     // optional: Cloudflare Turnstile site key (CAPTCHA); '' = off
+const BILLING_CONTACT = PRIVACY_CONTACT;          // where customers ask about their subscription
+const GRACE_DAYS = 14;                            // must match grace_days() in the database
+const CURRENCY = '\u20ac';                         // shown next to prices in Admin
 
 const $ = id => document.getElementById(id);
 const configured = !SUPABASE_URL.includes('YOUR-PROJECT') && !SUPABASE_ANON_KEY.includes('YOUR-ANON');
@@ -549,7 +581,7 @@ async function enter(){
 }
 
 /* ---------- admin tools ---------- */
-let adm = {profiles:[], access:[], tab:'users'};
+let adm = {profiles:[], access:[], plans:[], plansErr:'', tab:'users'};
 let approveFor = null;
 
 async function refreshBadge(){
@@ -557,12 +589,14 @@ async function refreshBadge(){
   const b = $('pendingBadge'); b.textContent = count || ''; b.hidden = !count;
 }
 async function loadAdmin(){
-  const [p, a] = await Promise.all([
+  const [p, a, pl] = await Promise.all([
     sb.from('profiles').select('*').order('created_at', {ascending:false}),
-    sb.from('customer_access').select('*')]);
+    sb.from('customer_access').select('*'),
+    sb.from('plans').select('*').order('tier')]);
   const err = p.error || a.error;
   if(err){ $('adminBody').textContent = 'Loading failed: ' + err.message; return; }
   adm.profiles = p.data; adm.access = a.data;
+  adm.plans = pl.error ? [] : pl.data; adm.plansErr = pl.error ? pl.error.message : '';
   renderAdmin(); refreshBadge();
 }
 $('adminBtn').onclick = async () => { $('adminBody').textContent = 'Loading…'; $('adminDialog').showModal(); await loadAdmin(); };
@@ -574,7 +608,9 @@ function renderAdmin(){
   const pend = adm.profiles.filter(p => p.status === 'pending').length;
   let html = `<div class="tabs">
     <button class="secondary small ${adm.tab==='users'?'on':''}" data-tab="users">Users${pend ? ` <span class="badge">${pend}</span>` : ''}</button>
-    <button class="secondary small ${adm.tab==='customers'?'on':''}" data-tab="customers">Customers</button></div>`;
+    <button class="secondary small ${adm.tab==='customers'?'on':''}" data-tab="customers">Customers</button>
+    <button class="secondary small ${adm.tab==='plans'?'on':''}" data-tab="plans">Plans &amp; prices</button></div>`;
+  if(adm.plansErr && adm.tab !== 'users') html += `<p class="msg err">Billing data is not available yet (${esc(adm.plansErr)}). Run migration-billing.sql in Supabase first.</p>`;
 
   if(adm.tab === 'users'){
     const order = {pending:0, rejected:1, approved:2};
@@ -598,16 +634,40 @@ function renderAdmin(){
           <td><span class="status ${stCss}">${stLabel}</span></td><td>${chips}<br>${sel}</td>
           <td class="actions" style="white-space:normal">${btns.join(' ')}</td></tr>`;
       }).join('') + `</tbody></table></div>`;
-  } else {
-    html += `<div class="table-wrap"><table><thead><tr><th>Customer</th><th>Assets</th><th>Users</th><th></th></tr></thead><tbody>` +
-      customers.map(c => {
+  } else if(adm.tab === 'customers'){
+    const tierOf = n => adm.plans.find(p => p.max_assets !== null && n <= p.max_assets) || adm.plans[adm.plans.length - 1];
+    const info = customers.map(c => ({c, b: billingInfo(c)}));
+    const cnt = st => info.filter(x => x.b.state === st).length;
+    html += `<p class="sub" style="margin-top:0">${customers.length} customer${customers.length===1?'':'s'}: ${info.filter(x => x.b.state !== 'open' && x.c.billing_status === 'trial').length} on trial, ${info.filter(x => x.b.state === 'active' && x.b.days <= 30).length} ending within 30 days, ${cnt('grace')} in grace period, ${cnt('expired')} expired.</p>`;
+    html += `<div class="table-wrap"><table><thead><tr><th>Customer</th><th>Assets / tier</th><th>Price</th><th>Status</th><th>Access until</th><th>Users</th><th></th></tr></thead><tbody>` +
+      info.map(({c, b}) => {
         const n = assets.filter(a => a.customer_id === c.id).length;
+        const tier = adm.plans.length ? tierOf(n) : null;
+        const price = tier ? (c.billing_period === 'yearly' ? tier.yearly_price : tier.monthly_price) : null;
+        const priceTxt = price === null || price === undefined ? '<span class="sub">no price set</span>' : `${esc(CURRENCY)}${Number(price).toFixed(2)} / ${c.billing_period === 'yearly' ? 'year' : 'month'}`;
+        let st, css;
+        if(b.state === 'open'){ st = 'No limit'; css = 'green'; }
+        else if(b.state === 'active'){ st = c.billing_status === 'trial' ? 'Trial' : 'Paid'; css = b.days <= 30 ? 'orange' : 'green'; }
+        else if(b.state === 'grace'){ st = 'Grace period'; css = 'red'; }
+        else { st = 'Expired'; css = 'red'; }
         const users = adm.access.filter(x => x.customer_id === c.id).map(x => (adm.profiles.find(p => p.id === x.user_id) || {}).email).filter(Boolean);
-        return `<tr><td><strong>${esc(c.name)}</strong></td><td>${n}</td><td>${users.map(esc).join('<br>') || '<span class="sub">none</span>'}</td>
-          <td class="actions"><button class="small secondary" data-act="rename" data-c="${esc(c.id)}">Rename</button>
+        return `<tr><td><strong>${esc(c.name)}</strong>${c.invoice_ref ? `<span class="sub">${esc(c.invoice_ref)}</span>` : ''}</td>
+          <td>${n}${tier ? `<span class="sub">${esc(tier.label)}</span>` : ''}</td><td>${priceTxt}</td>
+          <td><span class="status ${css}">${st}</span></td>
+          <td class="num">${c.access_until ? fmtDate(c.access_until) : '-'}${b.days !== null ? `<span class="sub">${b.days >= 0 ? b.days + ' d left' : -b.days + ' d ago'}</span>` : ''}</td>
+          <td>${users.map(esc).join('<br>') || '<span class="sub">none</span>'}</td>
+          <td class="actions"><button class="small" data-act="billing" data-c="${esc(c.id)}">Billing</button>
+          <button class="small secondary" data-act="rename" data-c="${esc(c.id)}">Rename</button>
           <button class="small danger" data-act="delcust" data-c="${esc(c.id)}">Delete…</button></td></tr>`;
       }).join('') + `</tbody></table></div>
-      <p class="sub">Deleting a customer also erases all assets and the history of that customer. Use this for data erasure requests.</p>`;
+      <p class="sub">The price follows the customer's number of assets. Nothing is charged automatically: use these figures for your invoices. Deleting a customer also erases all assets and the history of that customer. Use this for data erasure requests.</p>`;
+  } else {
+    html += `<div class="table-wrap"><table><thead><tr><th>Tier</th><th>Assets</th><th>Monthly price</th><th>Yearly price</th><th></th></tr></thead><tbody>` +
+      adm.plans.map(p => `<tr><td><strong>${esc(p.label)}</strong></td><td>${p.max_assets === null ? 'no upper limit' : 'up to ' + p.max_assets}</td>
+        <td>${p.monthly_price === null ? '<span class="sub">not set</span>' : esc(CURRENCY) + Number(p.monthly_price).toFixed(2)}</td>
+        <td>${p.yearly_price === null ? '<span class="sub">not set</span>' : esc(CURRENCY) + Number(p.yearly_price).toFixed(2)}</td>
+        <td class="actions"><button class="small secondary" data-act="editplan" data-tier="${p.tier}">Edit prices</button></td></tr>`).join('') +
+      `</tbody></table></div><p class="sub">A customer pays the price of the tier that matches the number of assets they have stored. New customers get a free trial of one month.</p>`;
   }
   $('adminBody').innerHTML = html;
 }
@@ -655,6 +715,17 @@ $('adminBody').addEventListener('click', async e => {
   else if(act === 'deluser'){
     if(!confirm(`Permanently delete ${prof.email}? The login will be removed. The customer's assets are kept.`)) return;
     if(await adminCall('admin_delete_user', {p_user:u}, 'User deleted')) loadAdmin();
+  }
+  else if(act === 'billing'){ openBilling(c); }
+  else if(act === 'editplan'){
+    const p = adm.plans.find(x => String(x.tier) === t.dataset.tier);
+    const ask = (label, cur) => { const v = prompt(`${p.label}: ${label} price in ${CURRENCY} (empty = not set)`, cur ?? ''); return v === null ? undefined : (v.trim() === '' ? null : Number(v.replace(',', '.'))); };
+    const monthly = ask('monthly', p.monthly_price); if(monthly === undefined) return;
+    const yearly = ask('yearly', p.yearly_price); if(yearly === undefined) return;
+    if([monthly, yearly].some(v => v !== null && (isNaN(v) || v < 0))) return toast('Enter a valid number');
+    const {error} = await sb.from('plans').update({monthly_price: monthly, yearly_price: yearly}).eq('tier', p.tier);
+    if(error) return fail(error, 'Saving prices failed');
+    toast('Prices saved'); loadAdmin();
   }
   else if(act === 'rename'){
     const cur = customers.find(x => x.id === c);
@@ -817,6 +888,38 @@ function makeReport(){
 }
 $('reportBtn').onclick = () => { try { makeReport(); } catch(e){ fail(e, 'Report failed'); } };
 
+/* ---------- billing dialog (admin) ---------- */
+let billFor = null;
+function openBilling(cid){
+  billFor = cid;
+  const c = customers.find(x => x.id === cid);
+  $('billTitle').textContent = 'Billing - ' + c.name;
+  $('bill-status').value = c.billing_status || 'paid';
+  $('bill-period').value = c.billing_period || 'monthly';
+  $('bill-until').value = c.access_until || '';
+  $('bill-ref').value = c.invoice_ref || '';
+  const n = assets.filter(a => a.customer_id === cid).length;
+  $('billInfo').textContent = `${n} asset${n === 1 ? '' : 's'} stored.`;
+  $('billDialog').showModal();
+}
+$('billExtend').onclick = () => {
+  const cur = parseDate($('bill-until').value);
+  const t = new Date(); t.setHours(0,0,0,0);
+  const base = cur && cur > t ? cur : t;                 // extend from the current end date, or from today if already ended
+  $('bill-until').value = toIso(addMonths(base, $('bill-period').value === 'yearly' ? 12 : 1));
+  $('bill-status').value = 'paid';
+};
+$('billCancel').onclick = () => $('billDialog').close();
+$('billForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const rec = {billing_status: $('bill-status').value, billing_period: $('bill-period').value,
+               access_until: $('bill-until').value || null, invoice_ref: $('bill-ref').value.trim()};
+  const {data, error} = await sb.from('customers').update(rec).eq('id', billFor).select().single();
+  if(error) return fail(error, 'Saving billing failed');
+  customers[customers.findIndex(c => c.id === billFor)] = data;
+  toast('Billing saved'); $('billDialog').close(); renderAdmin(); render();
+});
+
 /* ---------- privacy notice & terms ---------- */
 function renderLegal(){
   const unset = COMPANY_NAME.includes('JOUW') || PRIVACY_CONTACT.includes('jouwbedrijf');
@@ -854,6 +957,7 @@ function renderLegal(){
       <li>Keep your login details secret and do not share your account.</li>
       <li>We may refuse, block or delete an account in case of misuse.</li>
       <li>The service is provided without any guarantee of availability or accuracy of the status shown. Always check important expiry dates with your supplier. Make regular CSV exports as a backup.</li>
+      <li>New customers get a free trial of one month. After that, use of the tracker requires an active subscription (monthly or yearly), invoiced by ${co}. The price depends on the number of assets stored. When a subscription ends, access to the data is blocked after a grace period of ${GRACE_DAYS} days. Your data is kept so that access can be restored, and is erased on request.</li>
       <li>A maximum of 1000 assets can be stored per customer.</li>
     </ul>`;
 }
@@ -893,6 +997,7 @@ function enriched(){
   });
 }
 function render(){
+  renderBanner();
   const all = enriched();
   const scope = state.customer ? all.filter(a => a.customer_id === state.customer) : all;
 
@@ -916,7 +1021,7 @@ function render(){
     customers.map(c => {
       const mine = all.filter(a => a.customer_id === c.id);
       const exp = mine.filter(a => a.status==='expiring').length, ex = mine.filter(a => a.status==='expired').length;
-      return `<button class="chip ${state.customer===c.id?'active':''}" data-cust="${esc(c.id)}"><b>${esc(c.name)}</b> · ${mine.length} asset${mine.length===1?'':'s'}` +
+      return `<button class="chip ${state.customer===c.id?'active':''}" data-cust="${esc(c.id)}"><b>${esc(c.name)}</b> · ${mine.length} asset${mine.length===1?'':'s'}${me && me.role !== 'admin' && billingInfo(c).state === 'expired' ? ' <span class="red">expired</span>' : ''}` +
         (exp ? ` <span class="orange">● ${exp}</span>` : '') + (ex ? ` <span class="red">● ${ex}</span>` : '') + `</button>`;
     }).join('');
 
@@ -966,7 +1071,41 @@ function render(){
   $('empty').hidden = rows.length > 0;
   $('empty').textContent = !customers.length
     ? (me && me.role === 'admin' ? 'No customers yet. Click "+ Customer" to get started.' : 'You do not have access to a customer yet. Ask an admin for access.')
+    : (me && me.role !== 'admin' && customers.every(c => billingInfo(c).state === 'expired')) ? 'Your access has expired. Contact ' + BILLING_CONTACT + ' to reactivate.'
     : (assets.length ? 'No assets found for this filter.' : 'No assets yet. Click "+ Add asset".');
+}
+
+/* ---------- billing helpers ---------- */
+function toIso(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function addMonths(d, n){
+  const r = new Date(d.getFullYear(), d.getMonth() + n, 1);
+  const last = new Date(r.getFullYear(), r.getMonth() + 1, 0).getDate();
+  r.setDate(Math.min(d.getDate(), last)); return r;
+}
+// state: open (no end date) | active | grace (ended, still allowed) | expired
+function billingInfo(c){
+  if(!c.access_until) return {state:'open', days:null};
+  const d = daysLeft(c.access_until);
+  return {state: d >= 0 ? 'active' : (d >= -GRACE_DAYS ? 'grace' : 'expired'), days: d};
+}
+function renderBanner(){
+  const el = $('billingBanner');
+  if(!me || me.role === 'admin'){ el.innerHTML = ''; return; }
+  const out = [];
+  customers.forEach(c => {
+    const b = billingInfo(c); if(b.state === 'open') return;
+    const name = esc(c.name), until = fmtDate(c.access_until);
+    const link = `<a href="mailto:${esc(BILLING_CONTACT)}?subject=${encodeURIComponent('Subscription ' + c.name)}">Contact us</a>`;
+    if(b.state === 'active'){
+      const left = `${b.days} day${b.days === 1 ? '' : 's'} left`;
+      if(c.billing_status === 'trial') out.push(['info', `Free trial for <b>${name}</b> ends on ${until} (${left}). ${link} to continue after the trial.`]);
+      else if(b.days <= 30) out.push(['warn', `The subscription for <b>${name}</b> ends on ${until} (${left}). ${link} to renew.`]);
+    } else if(b.state === 'grace'){
+      const g = parseDate(c.access_until); g.setDate(g.getDate() + GRACE_DAYS);
+      out.push(['bad', `Access for <b>${name}</b> ended on ${until}. You can still use the tracker until ${fmtDate(toIso(g))}. ${link} to renew.`]);
+    } else out.push(['bad', `Access for <b>${name}</b> has expired. Your data is kept. ${link} to reactivate.`]);
+  });
+  el.innerHTML = out.map(([k, t]) => `<div class="bn bn-${k}">${t}</div>`).join('');
 }
 
 /* ---------- filters / sort ---------- */
@@ -1004,12 +1143,13 @@ const dlg = $('dialog');
 const F = ['hostname','vendor','model','serial','location','owner','warranty','contract_end','contract_type','contract_number','notes'];
 
 function openDialog(id){
-  if(!customers.length){ toast('No customer available yet'); return; }
+  const usable = customers.filter(c => me.role === 'admin' || billingInfo(c).state !== 'expired');
+  if(!usable.length){ toast(customers.length ? 'Your access has expired. Contact ' + BILLING_CONTACT : 'No customer available yet'); return; }
   state.editId = id || null;
   const a = id ? assets.find(x => x.id === id) : null;
   $('dialogTitle').textContent = a ? 'Edit asset' : 'Add asset';
-  $('customer').innerHTML = customers.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
-  $('customer').value = a ? a.customer_id : (state.customer || customers[0].id);
+  $('customer').innerHTML = usable.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
+  $('customer').value = a ? a.customer_id : (usable.some(c => c.id === state.customer) ? state.customer : usable[0].id);
   F.forEach(f => $(f).value = a ? (a[f] ?? '') : (f === 'vendor' ? 'Dell' : ''));
   if(a && ![...$('vendor').options].some(o => o.value === a.vendor)) $('vendor').add(new Option(a.vendor, a.vendor)), $('vendor').value = a.vendor;
   checkDup(); dlg.showModal(); $('hostname').focus();
