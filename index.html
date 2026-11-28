@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Infrastructure Lifecycle Tracker</title>
+<title>AssetGuardian</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2064%2064%22%3E%3Crect%20width=%2264%22%20height=%2264%22%20rx=%2214%22%20fill=%22%231f2937%22/%3E%3Crect%20x=%2212%22%20y=%2213%22%20width=%2240%22%20height=%2211%22%20rx=%223%22%20fill=%22%23f1f5f9%22/%3E%3Crect%20x=%2212%22%20y=%2227%22%20width=%2240%22%20height=%2211%22%20rx=%223%22%20fill=%22%23f1f5f9%22/%3E%3Crect%20x=%2212%22%20y=%2241%22%20width=%2240%22%20height=%2211%22%20rx=%223%22%20fill=%22%23f1f5f9%22/%3E%3Ccircle%20cx=%2245%22%20cy=%2218.5%22%20r=%223%22%20fill=%22%2316a34a%22/%3E%3Ccircle%20cx=%2245%22%20cy=%2232.5%22%20r=%223%22%20fill=%22%23ea580c%22/%3E%3Ccircle%20cx=%2245%22%20cy=%2246.5%22%20r=%223%22%20fill=%22%23dc2626%22/%3E%3Crect%20x=%2217%22%20y=%2216.5%22%20width=%2214%22%20height=%224%22%20rx=%222%22%20fill=%22%2394a3b8%22/%3E%3Crect%20x=%2217%22%20y=%2230.5%22%20width=%2214%22%20height=%224%22%20rx=%222%22%20fill=%22%2394a3b8%22/%3E%3Crect%20x=%2217%22%20y=%2244.5%22%20width=%2214%22%20height=%224%22%20rx=%222%22%20fill=%22%2394a3b8%22/%3E%3C/svg%3E">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -152,8 +152,8 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
 <header>
   <svg class="logo" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#1f2937"/><rect x="12" y="13" width="40" height="11" rx="3" fill="#f1f5f9"/><rect x="12" y="27" width="40" height="11" rx="3" fill="#f1f5f9"/><rect x="12" y="41" width="40" height="11" rx="3" fill="#f1f5f9"/><circle cx="45" cy="18.5" r="3" fill="#16a34a"/><circle cx="45" cy="32.5" r="3" fill="#ea580c"/><circle cx="45" cy="46.5" r="3" fill="#dc2626"/><rect x="17" y="16.5" width="14" height="4" rx="2" fill="#94a3b8"/><rect x="17" y="30.5" width="14" height="4" rx="2" fill="#94a3b8"/><rect x="17" y="44.5" width="14" height="4" rx="2" fill="#94a3b8"/></svg>
   <div>
-    <h1>Infrastructure Lifecycle Tracker</h1>
-    <p>Dell, HPE, NetApp, VMware, Veeam and other assets</p>
+    <h1>AssetGuardian</h1>
+    <p>Know when your IT support ends</p>
   </div>
   <div class="who" id="navPublic" hidden>
     <button class="secondary small" data-view="login">Sign in</button>
@@ -172,32 +172,35 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
 <div id="welcome" hidden>
  <div class="lp">
   <div class="lp-hero">
-    <h2>Never miss a warranty or support renewal again</h2>
-    <p>Keep the warranty and service contract end dates of all your Dell, HPE, NetApp, VMware, Veeam and other infrastructure in one place. See what is covered, what expires soon, and download a management report in one click.</p>
-    <div class="lp-cta">
+     <h2>Never be surprised by a renewal or an unsupported system again</h2>
+     <p>AssetGuardian keeps an eye on the warranty and support of your IT equipment, so you renew on time, stay supported and spend less time chasing dates in spreadsheets.</p>
+     <div class="lp-cta">
       <button data-view="signup">Start your 1-month free trial</button>
       <button class="ghost" data-view="login">Sign in</button>
     </div>
     <div class="lp-note">No credit card needed. After the trial you pay by invoice.</div>
     <div class="lp-mock" aria-label="Example of the overview">
       <div class="r hd"><span>Asset</span><span>Covered until</span><span>Status</span></div>
-      <div class="r"><span><b>srv-db01</b> &middot; Dell R750</span><span>14/03/2028</span><span class="tag" style="background:var(--green)">Active</span></div>
-      <div class="r"><span><b>san-02</b> &middot; NetApp FAS</span><span>02/01/2027</span><span class="tag" style="background:var(--orange)">Expiring soon</span></div>
-      <div class="r"><span><b>esx-03</b> &middot; HPE DL380</span><span>30/09/2026</span><span class="tag" style="background:var(--red)">Expired</span></div>
+      <div class="r"><span><b>Main server</b> &middot; Dell</span><span>14/03/2028</span><span class="tag" style="background:var(--green)">Active</span></div>
+      <div class="r"><span><b>Storage system</b> &middot; NetApp</span><span>02/01/2027</span><span class="tag" style="background:var(--orange)">Renew soon</span></div>
+      <div class="r"><span><b>Branch server</b> &middot; HPE</span><span>30/09/2026</span><span class="tag" style="background:var(--red)">No support</span></div>
       <div class="cap">Example data</div>
     </div>
   </div>
 
   <section>
-    <h3 class="sec">Everything you need to stay in control</h3>
-    <p class="sec-sub">Built for IT teams and service providers who manage hardware and software support contracts.</p>
+    <h3 class="sec">Stay in control, without the effort</h3>
+    <p class="sec-sub">Three things AssetGuardian does for you.</p>
     <div class="lp-grid">
-      <div class="lp-card"><h4>One clear overview</h4><p>All assets with warranty and service contract dates. Green, orange and red statuses show at a glance what needs attention, with a warning window you choose from 30 to 365 days.</p></div>
-      <div class="lp-card"><h4>Warranty and service contracts</h4><p>Track both. An asset counts as covered until the later of the two dates, so you see the real end of support.</p></div>
-      <div class="lp-card"><h4>Management report (PDF)</h4><p>Download a report with totals, a chart of expiries per month, a breakdown per vendor, and lists of expiring and expired assets.</p></div>
-      <div class="lp-card"><h4>Import and export</h4><p>Start fast by importing your asset list from a CSV file, and export your data at any time.</p></div>
-      <div class="lp-card"><h4>Your data stays yours</h4><p>Every company only sees its own data. Data is stored in the EU, and every change is logged so you can see who changed what and when.</p></div>
-      <div class="lp-card"><h4>Any vendor</h4><p>Dell, HPE, NetApp, VMware, Veeam and anything else: add what you run and keep one list.</p></div>
+      <div class="lp-card"><h4>Avoid unexpected contract renewals</h4><p>See which warranties and service contracts end soon, long before they do. No more surprise invoices or rushed renewals at the last minute.</p></div>
+      <div class="lp-card"><h4>Avoid unsupported systems</h4><p>Spot equipment that is no longer covered, so nothing critical runs without support when something breaks.</p></div>
+      <div class="lp-card"><h4>Save time</h4><p>Everything in one place instead of scattered spreadsheets and emails. Import your list in minutes and get a ready-made report for your manager or your customers.</p></div>
+    </div>
+    <h3 class="sec" style="margin-top:36px">Simple to use</h3>
+    <div class="lp-grid">
+      <div class="lp-card"><h4>Clear at a glance</h4><p>Green, orange and red show what is fine, what to renew soon and what is no longer covered.</p></div>
+      <div class="lp-card"><h4>A report in one click</h4><p>Download a clean PDF summary of what is covered, what expires soon and what already has expired.</p></div>
+      <div class="lp-card"><h4>Your data stays yours</h4><p>Every company only sees its own data. It is stored securely in the EU, and every change is logged.</p></div>
     </div>
   </section>
 
@@ -208,7 +211,7 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
       <div class="lp-card lp-step"><span class="n">1</span><div><h4>Register</h4><p>Create an account with your company name and email, then confirm your email address.</p></div></div>
       <div class="lp-card lp-step"><span class="n">2</span><div><h4>Get approved</h4><p>We review your request and activate your account with a one-month free trial.</p></div></div>
       <div class="lp-card lp-step"><span class="n">3</span><div><h4>Add your assets</h4><p>Enter them one by one or import a CSV file.</p></div></div>
-      <div class="lp-card lp-step"><span class="n">4</span><div><h4>Stay ahead</h4><p>Watch the overview and download your management report whenever you need it.</p></div></div>
+      <div class="lp-card lp-step"><span class="n">4</span><div><h4>Stay ahead</h4><p>See what needs attention and download your report whenever you need it.</p></div></div>
     </div>
   </section>
 
@@ -231,7 +234,7 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
   </section>
 
   <div class="lp-final">
-    <h3 class="sec" style="margin-bottom:12px">Ready to get your renewals under control?</h3>
+    <h3 class="sec" style="margin-bottom:12px">Take control of your renewals</h3>
     <div class="lp-cta"><button data-view="signup">Start your free trial</button></div>
     <p class="sec-sub" style="margin:14px auto 0;font-size:14px">Questions? <a id="lp-contact" href="#">Contact us</a></p>
   </div>
@@ -940,7 +943,7 @@ function makeReport(){
   // --- title band ---
   doc.setFillColor(...DARK); doc.rect(0, 0, W, 92, 'F');
   doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(20);
-  doc.text('Infrastructure Lifecycle Report', M, 44);
+  doc.text('AssetGuardian Report', M, 44);
   doc.setFont('helvetica','normal'); doc.setFontSize(11);
   doc.text(`${scopeName}  |  ${dateStr}  |  ${COMPANY_NAME}`, M, 66);
 
@@ -1038,11 +1041,11 @@ function makeReport(){
   const pages = doc.getNumberOfPages();
   for(let i = 1; i <= pages; i++){
     doc.setPage(i); doc.setFontSize(8); doc.setTextColor(...MUTED); doc.setFont('helvetica','normal');
-    doc.text(`${COMPANY_NAME} - Infrastructure Lifecycle Tracker - generated ${today.toLocaleDateString('en-GB')}`, M, H - 20);
+    doc.text(`${COMPANY_NAME} - AssetGuardian - generated ${today.toLocaleDateString('en-GB')}`, M, H - 20);
     doc.text(`Page ${i} of ${pages}`, W - M, H - 20, {align:'right'});
   }
   const suffix = state.customer ? '-' + custName(state.customer).replace(/[^\w-]+/g, '_') : '';
-  doc.save(`lifecycle-report${suffix}-${today.toISOString().slice(0,10)}.pdf`);
+  doc.save(`assetguardian-report${suffix}-${today.toISOString().slice(0,10)}.pdf`);
 }
 $('reportBtn').onclick = () => { try { makeReport(); } catch(e){ fail(e, 'Report failed'); } };
 
@@ -1100,7 +1103,7 @@ function renderLegal(){
   $('legalBody').innerHTML = `
     ${unset ? '<p class="msg err">Administrator: fill in <code>COMPANY_NAME</code> and <code>PRIVACY_CONTACT</code> at the top of the script before publishing this.</p>' : ''}
     <h3>1. Who is responsible?</h3>
-    <p>${co} ("we") runs this Infrastructure Lifecycle Tracker and is responsible for processing your personal data. Contact: <a href="mailto:${mail}">${mail}</a>.</p>
+    <p>${co} ("we") runs AssetGuardian and is responsible for processing your personal data. Contact: <a href="mailto:${mail}">${mail}</a>.</p>
     <h3>2. What data do we process?</h3>
     <ul>
       <li><strong>Account:</strong> email address, company name and your (hashed) password.</li>
