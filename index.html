@@ -83,6 +83,41 @@ footer{text-align:center;font-size:13px;color:var(--muted);padding:20px}
 .bn{padding:10px 14px;border-radius:8px;margin-bottom:10px;font-size:14px;border:1px solid}
 .bn-info{border-color:var(--primary)} .bn-warn{border-color:var(--orange)} .bn-bad{border-color:var(--red);color:var(--red)}
 .bn a{color:inherit;font-weight:bold}
+/* welcome page */
+.lp{max-width:1000px;margin:0 auto;padding:0 20px 20px}
+.lp-hero{background:var(--header);color:#fff;border-radius:16px;padding:56px 24px 44px;text-align:center;margin:20px 0 0}
+.lp-hero h2{font-size:clamp(28px,5vw,42px);line-height:1.15;margin:0 auto 14px;max-width:720px}
+.lp-hero p{font-size:clamp(15px,2.2vw,18px);opacity:.85;max-width:640px;margin:0 auto 26px;line-height:1.5}
+.lp-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.lp-cta button{padding:13px 24px;font-size:16px}
+.lp-cta .ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5)}
+.lp-cta .ghost:hover{background:rgba(255,255,255,.1)}
+.lp-note{font-size:13px;opacity:.7;margin-top:14px}
+.lp-mock{max-width:640px;margin:34px auto 0;background:var(--surface);color:var(--text);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.35);text-align:left;overflow:hidden}
+.lp-mock div.r{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px;align-items:center}
+.lp-mock div.r:last-child{border-bottom:none}
+.lp-mock .hd{background:var(--bg);color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.lp-mock .tag{justify-self:start;color:#fff;border-radius:6px;padding:3px 9px;font-size:12px;font-weight:bold}
+.lp-mock .cap{font-size:11px;color:var(--muted);padding:6px 14px;background:var(--bg)}
+.lp section{padding:44px 0 0}
+.lp h3.sec{font-size:24px;margin:0 0 6px;text-align:center}
+.lp .sec-sub{color:var(--muted);text-align:center;margin:0 auto 24px;max-width:600px}
+.lp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.lp-card{background:var(--surface);border-radius:12px;padding:20px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.lp-grid.four{grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+.lp-card h4{margin:0 0 6px;font-size:16px}
+.lp-card p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
+.lp-step{display:flex;gap:14px;align-items:flex-start}
+.lp-step .n{flex:none;width:32px;height:32px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold}
+.lp-price{text-align:center}
+.lp-price .amt{font-size:30px;font-weight:bold;margin:8px 0 0}
+.lp-price .amt small{font-size:14px;font-weight:normal;color:var(--muted)}
+.lp-price .yr{color:var(--muted);font-size:14px;margin-top:4px}
+.lp-price .save{display:inline-block;margin-top:8px;color:var(--green);font-size:13px;font-weight:bold}
+.lp details{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px}
+.lp summary{cursor:pointer;font-weight:bold}
+.lp details p{margin:10px 0 0;color:var(--muted);line-height:1.5;font-size:14px}
+.lp-final{text-align:center;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:32px 20px;margin-top:44px}
 /* admin */
 #adminDialog{width:min(1050px,96vw)}
 #adminBody select{width:auto;margin:4px 0;padding:6px}
@@ -120,6 +155,10 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
     <h1>Infrastructure Lifecycle Tracker</h1>
     <p>Dell, HPE, NetApp, VMware, Veeam and other assets</p>
   </div>
+  <div class="who" id="navPublic" hidden>
+    <button class="secondary small" data-view="login">Sign in</button>
+    <button class="small" data-view="signup">Start free trial</button>
+  </div>
   <div class="who" id="who" hidden>
     <span id="whoText"></span>
     <button class="small" id="adminBtn" hidden>Admin<span class="badge" id="pendingBadge" hidden></span></button>
@@ -128,6 +167,76 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
     <button class="secondary small" id="logoutBtn">Sign out</button>
   </div>
 </header>
+
+<!-- ============ WELCOME PAGE (shown before sign-in) ============ -->
+<div id="welcome" hidden>
+ <div class="lp">
+  <div class="lp-hero">
+    <h2>Never miss a warranty or support renewal again</h2>
+    <p>Keep the warranty and service contract end dates of all your Dell, HPE, NetApp, VMware, Veeam and other infrastructure in one place. See what is covered, what expires soon, and download a management report in one click.</p>
+    <div class="lp-cta">
+      <button data-view="signup">Start your 1-month free trial</button>
+      <button class="ghost" data-view="login">Sign in</button>
+    </div>
+    <div class="lp-note">No credit card needed. After the trial you pay by invoice.</div>
+    <div class="lp-mock" aria-label="Example of the overview">
+      <div class="r hd"><span>Asset</span><span>Covered until</span><span>Status</span></div>
+      <div class="r"><span><b>srv-db01</b> &middot; Dell R750</span><span>14/03/2028</span><span class="tag" style="background:var(--green)">Active</span></div>
+      <div class="r"><span><b>san-02</b> &middot; NetApp FAS</span><span>02/01/2027</span><span class="tag" style="background:var(--orange)">Expiring soon</span></div>
+      <div class="r"><span><b>esx-03</b> &middot; HPE DL380</span><span>30/09/2026</span><span class="tag" style="background:var(--red)">Expired</span></div>
+      <div class="cap">Example data</div>
+    </div>
+  </div>
+
+  <section>
+    <h3 class="sec">Everything you need to stay in control</h3>
+    <p class="sec-sub">Built for IT teams and service providers who manage hardware and software support contracts.</p>
+    <div class="lp-grid">
+      <div class="lp-card"><h4>One clear overview</h4><p>All assets with warranty and service contract dates. Green, orange and red statuses show at a glance what needs attention, with a warning window you choose from 30 to 365 days.</p></div>
+      <div class="lp-card"><h4>Warranty and service contracts</h4><p>Track both. An asset counts as covered until the later of the two dates, so you see the real end of support.</p></div>
+      <div class="lp-card"><h4>Management report (PDF)</h4><p>Download a report with totals, a chart of expiries per month, a breakdown per vendor, and lists of expiring and expired assets.</p></div>
+      <div class="lp-card"><h4>Import and export</h4><p>Start fast by importing your asset list from a CSV file, and export your data at any time.</p></div>
+      <div class="lp-card"><h4>Your data stays yours</h4><p>Every company only sees its own data. Data is stored in the EU, and every change is logged so you can see who changed what and when.</p></div>
+      <div class="lp-card"><h4>Any vendor</h4><p>Dell, HPE, NetApp, VMware, Veeam and anything else: add what you run and keep one list.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h3 class="sec">How it works</h3>
+    <p class="sec-sub">From sign-up to your first report in a few minutes.</p>
+    <div class="lp-grid four">
+      <div class="lp-card lp-step"><span class="n">1</span><div><h4>Register</h4><p>Create an account with your company name and email, then confirm your email address.</p></div></div>
+      <div class="lp-card lp-step"><span class="n">2</span><div><h4>Get approved</h4><p>We review your request and activate your account with a one-month free trial.</p></div></div>
+      <div class="lp-card lp-step"><span class="n">3</span><div><h4>Add your assets</h4><p>Enter them one by one or import a CSV file.</p></div></div>
+      <div class="lp-card lp-step"><span class="n">4</span><div><h4>Stay ahead</h4><p>Watch the overview and download your management report whenever you need it.</p></div></div>
+    </div>
+  </section>
+
+  <section id="lp-pricing">
+    <h3 class="sec">Simple pricing</h3>
+    <p class="sec-sub">The price depends on how many assets you store. All plans include every feature. Prices exclude VAT and are invoiced monthly or yearly.</p>
+    <div class="lp-grid four" id="lp-plans"></div>
+    <p class="sec-sub" style="margin-top:16px">Your first month is free. Cancel any time before it ends and you pay nothing.</p>
+  </section>
+
+  <section>
+    <h3 class="sec">Questions</h3>
+    <p class="sec-sub"></p>
+    <details><summary>Do I need a credit card?</summary><p>No. After your free month you receive an invoice, and you choose monthly or yearly billing.</p></details>
+    <details><summary>What happens when my trial or subscription ends?</summary><p>You get a short grace period. After that your access is paused. Your data is kept so you can pick up where you left off when you renew.</p></details>
+    <details><summary>Is my data safe?</summary><p>Each company can only see its own data, access requires a personal login, and the data is stored in the European Union. Read the <a href="#" data-legal>privacy notice and terms</a> for details.</p></details>
+    <details><summary>Can I get my data out?</summary><p>Yes. You can export your assets as CSV at any time, and ask us to delete your account and data.</p></details>
+    <details><summary>What if I store more assets than my plan allows?</summary><p>You move to the next plan. The price follows the number of assets you store.</p></details>
+    <details><summary>How do I cancel or change my plan?</summary><p>Contact us and we will take care of it.</p></details>
+  </section>
+
+  <div class="lp-final">
+    <h3 class="sec" style="margin-bottom:12px">Ready to get your renewals under control?</h3>
+    <div class="lp-cta"><button data-view="signup">Start your free trial</button></div>
+    <p class="sec-sub" style="margin:14px auto 0;font-size:14px">Questions? <a id="lp-contact" href="#">Contact us</a></p>
+  </div>
+ </div>
+</div>
 
 <!-- ============ AUTH SCREENS ============ -->
 <div id="authBox" hidden>
@@ -142,7 +251,8 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
     <p class="msg" id="msg-login" hidden></p>
     <button type="submit" style="width:100%">Sign in</button>
     <p class="links"><a href="#" data-view="forgot">Forgot password?</a><br>
-      No account yet? <a href="#" data-view="signup">Register your company</a></p>
+      No account yet? <a href="#" data-view="signup">Register your company</a><br>
+      <a href="#" data-welcome>&larr; Back to overview</a></p>
   </form>
 
   <form class="authview" id="view-signup" hidden>
@@ -161,7 +271,8 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
     <p class="msg" id="msg-signup" hidden></p>
     <button type="submit" style="width:100%">Request account</button>
     <p class="hint" style="margin:12px 0 0">After you confirm your email address, the administrator will review your request.</p>
-    <p class="links"><a href="#" data-view="login">Back to sign in</a></p>
+    <p class="links"><a href="#" data-view="login">Back to sign in</a><br>
+      <a href="#" data-welcome>&larr; Back to overview</a></p>
   </form>
 
   <form class="authview" id="view-forgot" hidden>
@@ -472,10 +583,43 @@ function setMsg(view, text, kind){
 }
 function showView(v, text, kind){
   $('app').hidden = true; $('who').hidden = true; $('authBox').hidden = false;
+  $('welcome').hidden = true; $('navPublic').hidden = true;
   document.querySelectorAll('.authview').forEach(el => el.hidden = el.id !== 'view-' + v);
   document.querySelectorAll('.msg').forEach(m => m.hidden = true);
   if(text) setMsg(v, text, kind);
 }
+let publicPlansLoaded = false;
+async function renderPublicPlans(){
+  const box = $('lp-plans');
+  $('lp-contact').href = 'mailto:' + BILLING_CONTACT;
+  if(publicPlansLoaded) return;
+  let plans = [];
+  try { const {data, error} = await sb.rpc('public_plans'); if(!error && Array.isArray(data)) plans = data; } catch(e){}
+  if(!plans.length){
+    box.innerHTML = `<div class="lp-card lp-price" style="grid-column:1/-1"><h4>Pricing on request</h4><p>Ask us for a quote: <a href="mailto:${esc(BILLING_CONTACT)}">${esc(BILLING_CONTACT)}</a></p></div>`;
+    return;
+  }
+  publicPlansLoaded = true;
+  box.innerHTML = plans.map(p => {
+    const m = p.monthly_price, y = p.yearly_price;
+    const amount = m != null ? `<div class="amt">${money(m)} <small>/ month</small></div>` : '<div class="amt"><small>On request</small></div>';
+    let yearly = '', save = '';
+    if(y != null){
+      yearly = `<div class="yr">or ${money(y)} / year</div>`;
+      if(m != null && m * 12 > y){
+        const months = Math.round((m * 12 - y) / m * 10) / 10;
+        save = `<span class="save">Save ${money(m * 12 - y)} (${months} month${months === 1 ? '' : 's'} free)</span>`;
+      }
+    }
+    return `<div class="lp-card lp-price"><h4>${esc(p.label)}</h4>${amount}${yearly}${save}</div>`;
+  }).join('');
+}
+function showWelcome(){
+  $('app').hidden = true; $('who').hidden = true; $('authBox').hidden = true;
+  $('welcome').hidden = false; $('navPublic').hidden = false;
+  renderPublicPlans();
+}
+document.querySelectorAll('[data-welcome]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); showWelcome(); }));
 function resetState(){
   me = null; customers = []; assets = [];
   state = {filter:'all', customer:'', sortKey:'warranty', sortDir:1, editId:null};
@@ -497,7 +641,7 @@ async function boot(){
 
   sb.auth.onAuthStateChange(ev => {           // keep this callback synchronous
     if(ev === 'PASSWORD_RECOVERY'){ recovering = true; $('rc-cancel').hidden = true; showView('recovery'); }
-    else if(ev === 'SIGNED_OUT'){ recovering = false; resetState(); showView('login'); }
+    else if(ev === 'SIGNED_OUT'){ recovering = false; resetState(); showWelcome(); }
   });
 
   const {data} = await sb.auth.getSession();   // lets the client consume the link in the URL first
@@ -505,7 +649,7 @@ async function boot(){
 
   if(linkError) return showView('login', 'This link has expired or was already used. Request a new one below via "Forgot password", or sign in if your account is already confirmed.', 'err');
   if(recovering && data.session){ $('rc-cancel').hidden = true; return showView('recovery'); }
-  if(data.session) await enter(); else showView('login');
+  if(data.session) await enter(); else showWelcome();
 }
 
 $('view-login').addEventListener('submit', async e => {
@@ -568,7 +712,7 @@ $('recheckBtn').onclick = () => enter();
 async function enter(){
   if(recovering) return;
   const {data:{user}} = await sb.auth.getUser();
-  if(!user){ showView('login'); return; }
+  if(!user){ showWelcome(); return; }
   const {data:prof, error} = await sb.from('profiles').select('*').eq('id', user.id).single();
   if(error){ fail(error, 'Could not load profile'); return; }
   me = prof;
@@ -586,7 +730,7 @@ async function enter(){
   }
 
   $('whoText').textContent = `${me.email} (${me.role === 'admin' ? 'admin' : 'engineer'})`;
-  $('authBox').hidden = true; $('who').hidden = false; $('app').hidden = false;
+  $('authBox').hidden = true; $('welcome').hidden = true; $('navPublic').hidden = true; $('who').hidden = false; $('app').hidden = false;
   $('custBtn').hidden = me.role !== 'admin';
   $('adminBtn').hidden = me.role !== 'admin';
   $('subBtn').hidden = me.role === 'admin';
