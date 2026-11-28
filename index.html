@@ -882,7 +882,9 @@ $('adminBody').addEventListener('click', async e => {
     const p = adm.plans.find(x => String(x.tier) === t.dataset.tier);
     const ask = (label, cur) => { const v = prompt(`${p.label}: ${label} price in ${CURRENCY} (empty = not set)`, cur ?? ''); return v === null ? undefined : (v.trim() === '' ? null : Number(v.replace(',', '.'))); };
     const monthly = ask('monthly', p.monthly_price); if(monthly === undefined) return;
-    const yearly = ask('yearly', p.yearly_price); if(yearly === undefined) return;
+    // yearly defaults to 10x the monthly price (2 months free); you can still type another amount
+    const yearlyDefault = monthly === null ? p.yearly_price : Math.round(monthly * 10 * 100) / 100;
+    const yearly = ask('yearly (default = 10 x monthly)', yearlyDefault); if(yearly === undefined) return;
     if([monthly, yearly].some(v => v !== null && (isNaN(v) || v < 0))) return toast('Enter a valid number');
     const {error} = await sb.from('plans').update({monthly_price: monthly, yearly_price: yearly}).eq('tier', p.tier);
     if(error) return fail(error, 'Saving prices failed');
