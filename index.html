@@ -57,6 +57,10 @@ button:disabled{opacity:.6;cursor:wait}
 .table-wrap{overflow-x:auto;background:var(--surface);border-radius:10px;box-shadow:var(--shadow)}
 /* big lists: scroll inside the table (header + scrollbar stay visible), Edit column stays on screen */
 .main-table{max-height:72vh;overflow:auto}
+.main-table table{font-size:14px}
+.main-table th,.main-table td{padding:8px 8px}
+.main-table th{font-size:13px}
+.main-table td.num{width:1%}
 .main-table th{position:sticky;top:0;z-index:2}
 .main-table th.stick-r,.main-table td.stick-r{position:sticky;right:0;box-shadow:-6px 0 8px -6px rgba(0,0,0,.25)}
 .main-table td.stick-r{background:var(--surface);z-index:1}
@@ -364,10 +368,10 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
         <th class="sortable" data-sort="vendor">Vendor</th>
         <th class="sortable" data-sort="model">Model</th>
         <th class="sortable" data-sort="serial">Serial</th>
-        <th class="sortable" data-sort="location">Location / Owner</th>
-        <th class="sortable" data-sort="warranty">Warranty until</th>
-        <th class="sortable" data-sort="contract_end">Contract until</th>
-        <th class="sortable" data-sort="days">Remaining</th>
+        <th class="sortable" data-sort="location">Location</th>
+        <th class="sortable" data-sort="warranty">Warranty</th>
+        <th class="sortable" data-sort="contract_end">Contract</th>
+        <th class="sortable" data-sort="days">Left</th>
         <th>Status</th><th class="stick-r"></th>
       </tr></thead>
       <tbody id="assetTable"></tbody>
