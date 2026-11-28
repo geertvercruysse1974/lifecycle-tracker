@@ -657,7 +657,7 @@ function renderAdmin(){
         const price = tier ? (c.billing_period === 'yearly' ? tier.yearly_price : tier.monthly_price) : null;
         const priceTxt = price === null || price === undefined ? '<span class="sub">no price set</span>' : `${esc(CURRENCY)}${Number(price).toFixed(2)} / ${c.billing_period === 'yearly' ? 'year' : 'month'}`;
         let st, css;
-        if(b.state === 'open'){ st = 'No limit'; css = 'green'; }
+        if(b.state === 'open'){ st = c.billing_status === 'trial' ? 'Trial: no end date!' : 'No limit'; css = c.billing_status === 'trial' ? 'orange' : 'green'; }
         else if(b.state === 'active'){ st = c.billing_status === 'trial' ? 'Trial' : 'Paid'; css = b.days <= 30 ? 'orange' : 'green'; }
         else if(b.state === 'grace'){ st = 'Grace period'; css = 'red'; }
         else { st = 'Expired'; css = 'red'; }
@@ -921,8 +921,17 @@ $('billExtend').onclick = () => {
   $('bill-status').value = 'paid';
 };
 $('billCancel').onclick = () => $('billDialog').close();
+// a free trial always needs an end date: default to one month from today
+function trialDefault(){
+  const t = new Date(); t.setHours(0,0,0,0);
+  return toIso(addMonths(t, 1));
+}
+$('bill-status').addEventListener('change', () => {
+  if($('bill-status').value === 'trial' && !$('bill-until').value) $('bill-until').value = trialDefault();
+});
 $('billForm').addEventListener('submit', async e => {
   e.preventDefault();
+  if($('bill-status').value === 'trial' && !$('bill-until').value) $('bill-until').value = trialDefault();
   const rec = {billing_status: $('bill-status').value, billing_period: $('bill-period').value,
                access_until: $('bill-until').value || null, invoice_ref: $('bill-ref').value.trim()};
   const {data, error} = await sb.from('customers').update(rec).eq('id', billFor).select().single();
