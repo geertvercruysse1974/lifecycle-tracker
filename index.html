@@ -340,6 +340,9 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
         <select id="bill-status"><option value="trial">Free trial</option><option value="paid">Paid</option></select></div>
       <div><label for="bill-period">Billing period</label>
         <select id="bill-period"><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select></div>
+      <div class="full"><label for="bill-plan">Plan</label>
+        <select id="bill-plan"></select>
+        <p class="sub" style="margin:-8px 0 12px">Automatic = the plan follows the number of assets the customer stores. Or fix a plan for this customer.</p></div>
       <div class="full"><label for="bill-until">Access until</label>
         <input type="date" id="bill-until">
         <p class="sub" style="margin:-8px 0 12px">Leave empty for no limit. Users keep working for a grace period after this date.</p></div>
@@ -653,7 +656,7 @@ function renderAdmin(){
     html += `<div class="table-wrap"><table><thead><tr><th>Customer</th><th>Assets / tier</th><th>Price</th><th>Status</th><th>Access until</th><th>Users</th><th></th></tr></thead><tbody>` +
       info.map(({c, b}) => {
         const n = assets.filter(a => a.customer_id === c.id).length;
-        const tier = adm.plans.length ? tierOf(n) : null;
+        const tier = adm.plans.length ? ((c.plan_tier && adm.plans.find(p => p.tier === c.plan_tier)) || tierOf(n)) : null;
         const price = tier ? (c.billing_period === 'yearly' ? tier.yearly_price : tier.monthly_price) : null;
         const priceTxt = price === null || price === undefined ? '<span class="sub">no price set</span>' : `${esc(CURRENCY)}${Number(price).toFixed(2)} / ${c.billing_period === 'yearly' ? 'year' : 'month'}`;
         let st, css;
@@ -663,7 +666,7 @@ function renderAdmin(){
         else { st = 'Expired'; css = 'red'; }
         const users = adm.access.filter(x => x.customer_id === c.id).map(x => (adm.profiles.find(p => p.id === x.user_id) || {}).email).filter(Boolean);
         return `<tr><td><strong>${esc(c.name)}</strong>${c.invoice_ref ? `<span class="sub">${esc(c.invoice_ref)}</span>` : ''}</td>
-          <td>${n}${tier ? `<span class="sub">${esc(tier.label)}</span>` : ''}</td><td>${priceTxt}</td>
+          <td>${n}${tier ? `<span class="sub">${esc(tier.label)}${c.plan_tier ? ' (fixed)' : ''}</span>` : ''}</td><td>${priceTxt}</td>
           <td><span class="status ${css}">${st}</span></td>
           <td class="num">${c.access_until ? fmtDate(c.access_until) : '-'}${b.days !== null ? `<span class="sub">${b.days >= 0 ? b.days + ' d left' : -b.days + ' d ago'}</span>` : ''}</td>
           <td>${users.map(esc).join('<br>') || '<span class="sub">none</span>'}</td>
@@ -909,6 +912,10 @@ function openBilling(cid){
   $('bill-period').value = c.billing_period || 'monthly';
   $('bill-until').value = c.access_until || '';
   $('bill-ref').value = c.invoice_ref || '';
+  $('bill-plan').innerHTML = '<option value="">Automatic (by number of assets)</option>' +
+    adm.plans.map(p => `<option value="${p.tier}">${esc(p.label)}</option>`).join('');
+  $('bill-plan').value = c.plan_tier ? String(c.plan_tier) : '';
+  $('bill-plan').disabled = c.plan_tier === undefined;      // column not there until migration-plan-override.sql has run
   const n = assets.filter(a => a.customer_id === cid).length;
   $('billInfo').textContent = `${n} asset${n === 1 ? '' : 's'} stored.`;
   $('billDialog').showModal();
@@ -934,6 +941,8 @@ $('billForm').addEventListener('submit', async e => {
   if($('bill-status').value === 'trial' && !$('bill-until').value) $('bill-until').value = trialDefault();
   const rec = {billing_status: $('bill-status').value, billing_period: $('bill-period').value,
                access_until: $('bill-until').value || null, invoice_ref: $('bill-ref').value.trim()};
+  const cur = customers.find(c => c.id === billFor);
+  if(cur && cur.plan_tier !== undefined) rec.plan_tier = $('bill-plan').value ? Number($('bill-plan').value) : null;
   const {data, error} = await sb.from('customers').update(rec).eq('id', billFor).select().single();
   if(error) return fail(error, 'Saving billing failed');
   customers[customers.findIndex(c => c.id === billFor)] = data;
@@ -1166,7 +1175,7 @@ $('subBtn').onclick = async () => {
       row('Billing', c.billing_status === 'trial' ? 'No charge during the trial' : (c.billing_period === 'yearly' ? 'Yearly' : 'Monthly')) +
       row('Price of your plan', prices) +
       row('Access until', c.access_until ? `${fmtDate(c.access_until)}${b.days !== null ? ` (${b.days >= 0 ? b.days + ' days left' : -b.days + ' days ago'})` : ''}` : 'No end date') +
-      (pi.max_assets && pi.next_label ? `</table><p class="sub">If you store more than ${pi.max_assets} assets you move to the next plan (${esc(pi.next_label)}).</p>` : '</table>') ;
+      (pi.max_assets && pi.next_label && !pi.fixed ? `</table><p class="sub">If you store more than ${pi.max_assets} assets you move to the next plan (${esc(pi.next_label)}).</p>` : '</table>') ;
   }).join('') + `<p style="margin-top:16px"><a href="mailto:${esc(BILLING_CONTACT)}?subject=Subscription">Contact us</a> to renew, switch between monthly and yearly, or change plan.</p>`;
 };
 $('subClose').onclick = () => $('subDialog').close();
