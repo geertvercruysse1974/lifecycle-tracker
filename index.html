@@ -55,6 +55,12 @@ button.small{padding:5px 10px;font-size:13px}
 button:disabled{opacity:.6;cursor:wait}
 
 .table-wrap{overflow-x:auto;background:var(--surface);border-radius:10px;box-shadow:var(--shadow)}
+/* big lists: scroll inside the table (header + scrollbar stay visible), Edit column stays on screen */
+.main-table{max-height:72vh;overflow:auto}
+.main-table th{position:sticky;top:0;z-index:2}
+.main-table th.stick-r,.main-table td.stick-r{position:sticky;right:0;box-shadow:-6px 0 8px -6px rgba(0,0,0,.25)}
+.main-table td.stick-r{background:var(--surface);z-index:1}
+.main-table th.stick-r{background:var(--header);z-index:3}
 table{width:100%;border-collapse:collapse}
 th{background:var(--header);color:#fff;user-select:none;white-space:nowrap}
 th.sortable{cursor:pointer} th.sortable:hover{background:#374151}
@@ -350,7 +356,7 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
     </label>
   </div>
 
-  <div class="table-wrap">
+  <div class="table-wrap main-table">
     <table>
       <thead><tr>
         <th class="sortable" data-sort="customer_name">Customer</th>
@@ -362,7 +368,7 @@ dialog input,dialog select,dialog textarea{width:100%;padding:10px;margin:5px 0 
         <th class="sortable" data-sort="warranty">Warranty until</th>
         <th class="sortable" data-sort="contract_end">Contract until</th>
         <th class="sortable" data-sort="days">Remaining</th>
-        <th>Status</th><th></th>
+        <th>Status</th><th class="stick-r"></th>
       </tr></thead>
       <tbody id="assetTable"></tbody>
     </table>
@@ -1240,7 +1246,7 @@ function render(){
       <td class="num">${a.contract_end ? fmtDate(a.contract_end) : '—'}${(a.contract_type || a.contract_number) ? `<span class="sub">${esc([a.contract_type, a.contract_number].filter(Boolean).join(' · '))}</span>` : ''}</td>
       <td class="num ${ui.css}">${remaining(a.days)}<span class="sub">via ${a.via === 'contract' ? 'contract' : 'warranty'}</span></td>
       <td><span class="status ${ui.css}">${ui.label}</span></td>
-      <td class="actions">
+      <td class="actions stick-r">
         <button class="small secondary" data-hist="${esc(a.id)}" title="History">⟲</button>
         <button class="small secondary" data-edit="${esc(a.id)}">Edit</button>
         <button class="small danger" data-del="${esc(a.id)}">✕</button>
